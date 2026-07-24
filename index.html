@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #ffffff;
+            --gradient-color: #f0f0f0;
+            --text-color: #000000;
+            --accent-color: #000000;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            overflow: hidden;
+            transition: background 0.3s ease;
+            background: var(--bg-color);
+        }
+
+        body.gradient-on {
+            background: linear-gradient(135deg, var(--bg-color) 0%, var(--gradient-color) 100%);
+            animation: gradientShift 15s ease infinite;
+        }
+
+        body.gradient-diagonal {
+            background: linear-gradient(45deg, var(--bg-color) 0%, var(--gradient-color) 100%);
+        }
+
+        body.gradient-radial {
+            background: radial-gradient(circle, var(--bg-color) 0%, var(--gradient-color) 100%);
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(10deg); }
+        }
+
+        body.gradient-movement-off {
+            animation: none !important;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .clock-display {
+            text-align: center;
+            z-index: 10;
+        }
+
+        .time {
+            font-size: 12vw;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            color: var(--text-color);
+            line-height: 1;
+            margin: 0;
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .date {
+            font-size: 1.5vw;
+            color: var(--text-color);
+            margin-top: 2vw;
+            letter-spacing: 0.05em;
+            font-weight: 400;
+            opacity: 0.7;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Timer/Stopwatch Controls Below Clock */
+        .time-controls {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 30;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .time-controls.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .time-controls-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 50px);
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .time-btn {
+            width: 50px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            font-weight: 500;
+        }
+
+        .time-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .time-btn.subtract {
+            background: rgba(255, 59, 48, 0.2);
+            border-color: rgba(255, 59, 48, 0.4);
+        }
+
+        .time-btn.subtract:hover {
+            background: rgba(255, 59, 48, 0.3);
+        }
+
+        .stopwatch-controls-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .stopwatch-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            font-weight: 500;
+        }
+
+        .stopwatch-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .stopwatch-btn.primary {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+        }
+
+        .stopwatch-btn.primary:hover {
+            opacity: 0.8;
+        }
+
+        .alarm-selector {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .alarm-selector select {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .alarm-selector select option {
+            background: #333;
+            color: white;
+        }
+
+        .controls {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 3vmin;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 50;
+        }
+
+        .controls.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .settings-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-color);
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .mode-controls {
+            position: fixed;
+            bottom: 3vmin;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 50;
+        }
+
+        .mode-btn {
+            padding: 10px 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 14px;
+            font-family: inherit;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+        }
+
+        .mode-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .mode-btn.active {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+        }
+
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .settings-panel.open {
+            transform: translateX(0);
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .settings-header h2 {
+            font-size: 20px;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .close-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-color);
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .settings-section {
+            margin-bottom: 32px;
+        }
+
+        .settings-section h3 {
+            font-size: 12px;
+            color: var(--text-color);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+            font-weight: 600;
+            opacity: 0.7;
+        }
+
+        .settings-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .color-picker-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .color-input-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .color-input-row label {
+            flex: 1;
+            font-size: 13px;
+            color: var(--text-color);
+        }
+
+        .color-input-row input[type="color"] {
+            width: 50px;
+            height: 44px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .theme-preview {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-preview:hover {
+            transform: scale(1.05);
+        }
+
+        .theme-preview.active {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .font-preview {
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-color);
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .font-preview:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .font-preview.active {
+            border-color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border: none;
+            padding: 0;
+        }
+
+        .toggle.on {
+            background: var(--accent-color);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.2s ease;
+        }
+
+        .toggle.on::after {
+            left: 24px;
+        }
+
+        .toggle-label {
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .select-group {
+            margin-bottom: 12px;
+        }
+
+        .select-label {
+            display: block;
+            color: var(--text-color);
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        select:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        select option {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .gradient-options {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .gradient-option {
+            flex: 1;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .gradient-option.active {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            .settings-panel {
+                max-width: 100%;
+            }
+
+            .time {
+                font-size: 18vw;
+            }
+
+            .date {
+                font-size: 4vw;
+            }
+
+            .settings-group {
+                grid-template-columns: 1fr;
+            }
+
+            .time-controls-grid {
+                grid-template-columns: repeat(3, 50px);
+            }
+        }
+
+        /* Themes */
+        .theme-midnight { background: linear-gradient(135deg, #0f0f1e 0%, #1a1a3e 100%); color: #ffffff; }
+        .theme-ocean { background: linear-gradient(135deg, #001a33 0%, #004466 100%); color: #ffffff; }
+        .theme-aurora { background: linear-gradient(135deg, #0a3a52 0%, #16e0bd 100%); color: #ffffff; }
+        .theme-sunset { background: linear-gradient(135deg, #ff6b35 0%, #ffa500 100%); color: #000000; }
+        .theme-purple-space { background: linear-gradient(135deg, #2d1b69 0%, #8f39fc 100%); color: #ffffff; }
+        .theme-snow { background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%); color: #000000; }
+        .theme-forest { background: linear-gradient(135deg, #1b4332 0%, #52b788 100%); color: #ffffff; }
+        .theme-ember { background: linear-gradient(135deg, #6a040f 0%, #ff006e 100%); color: #ffffff; }
+        .theme-gold { background: linear-gradient(135deg, #8b7500 0%, #ffd700 100%); color: #000000; }
+        .theme-monochrome { background: linear-gradient(135deg, #000000 0%, #ffffff 100%); color: #ffffff; }
+
+        /* Font Styles */
+        .font-inter { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        .font-helvetica { font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, sans-serif; }
+        .font-orbitron { font-family: 'Orbitron', monospace; }
+        .font-roboto-mono { font-family: 'Roboto Mono', monospace; }
+        .font-space-mono { font-family: 'Space Mono', monospace; }
+        .font-playfair { font-family: 'Playfair Display', serif; }
+        .font-poppins { font-family: 'Poppins', sans-serif; }
+        .font-montserrat { font-family: 'Montserrat', sans-serif; }
+        .font-raleway { font-family: 'Raleway', sans-serif; }
+        .font-lora { font-family: 'Lora', serif; }
+    </style>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&family=Space+Mono:wght@400;700&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600&family=Montserrat:wght@400;600&family=Raleway:wght@400;600&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="clock-display" id="clockDisplay">
+            <p class="time" id="time">00:00:00</p>
+            <p class="date" id="date"></p>
+        </div>
+
+        <!-- Timer Controls -->
+        <div class="time-controls" id="timerControls">
+            <div class="time-controls-grid">
+                <button class="time-btn subtract" data-adjust="-3600">-1h</button>
+                <button class="time-btn subtract" data-adjust="-1800">-30m</button>
+                <button class="time-btn subtract" data-adjust="-300">-5m</button>
+                <button class="time-btn subtract" data-adjust="-60">-1m</button>
+                <button class="time-btn" data-adjust="60">+1m</button>
+                <button class="time-btn" data-adjust="300">+5m</button>
+                <button class="time-btn" data-adjust="900">+15m</button>
+                <button class="time-btn" data-adjust="1800">+30m</button>
+                <button class="time-btn" data-adjust="3600">+1h</button>
+                <button class="time-btn subtract" data-adjust="-10">-10s</button>
+                <button class="time-btn subtract" data-adjust="-5">-5s</button>
+                <button class="time-btn" data-adjust="5">+5s</button>
+            </div>
+            <div class="alarm-selector">
+                <select id="alarmSelect">
+                    <option value="none">🔇 No alarm</option>
+                    <option value="bell">🔔 Bell</option>
+                    <option value="chime">🎵 Chime</option>
+                    <option value="beep">📍 Beep</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Stopwatch Controls -->
+        <div class="time-controls" id="stopwatchControls">
+            <div class="stopwatch-controls-row">
+                <button class="stopwatch-btn primary" id="stopwatchStartBtn">Start</button>
+                <button class="stopwatch-btn" id="stopwatchPauseBtn">Pause</button>
+                <button class="stopwatch-btn" id="stopwatchResetBtn">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls" id="controls">
+        <button class="settings-btn" id="settingsBtn">⚙️</button>
+        <div></div>
+    </div>
+
+    <div class="mode-controls" id="modeControls">
+        <button class="mode-btn active" data-mode="clock">Clock</button>
+        <button class="mode-btn" data-mode="timer">Timer</button>
+        <button class="mode-btn" data-mode="stopwatch">Stopwatch</button>
+    </div>
+
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <h2>Settings</h2>
+            <button class="close-btn" id="closeSettings">&times;</button>
+        </div>
+
+        <!-- Custom Colors -->
+        <div class="settings-section">
+            <h3>Colors</h3>
+            <div class="color-picker-group">
+                <div class="color-input-row">
+                    <label>Background</label>
+                    <input type="color" id="bgColor" value="#ffffff">
+                </div>
+                <div class="color-input-row">
+                    <label>Gradient</label>
+                    <input type="color" id="gradientColor" value="#f0f0f0">
+                </div>
+                <div class="color-input-row">
+                    <label>Text</label>
+                    <input type="color" id="textColor" value="#000000">
+                </div>
+                <div class="color-input-row">
+                    <label>Accent</label>
+                    <input type="color" id="accentColor" value="#000000">
+                </div>
+            </div>
+        </div>
+
+        <!-- Preset Themes -->
+        <div class="settings-section">
+            <h3>Preset Themes</h3>
+            <div class="settings-group" id="themeGroup">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+
+        <!-- Gradient -->
+        <div class="settings-section">
+            <h3>Gradient</h3>
+            <div class="toggle-group">
+                <button class="toggle" id="gradientToggle"></button>
+                <label class="toggle-label">Enable Gradient</label>
+            </div>
+            <div id="gradientOptions" style="display: none;">
+                <div class="toggle-group">
+                    <button class="toggle" id="gradientMovementToggle"></button>
+                    <label class="toggle-label">Animate Gradient</label>
+                </div>
+                <label class="settings-label" style="display: block; color: var(--text-color); font-size: 12px; margin-bottom: 8px;">Style</label>
+                <div class="gradient-options">
+                    <button class="gradient-option active" data-gradient="linear">Linear</button>
+                    <button class="gradient-option" data-gradient="diagonal">Diagonal</button>
+                    <button class="gradient-option" data-gradient="radial">Radial</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Font -->
+        <div class="settings-section">
+            <h3>Font</h3>
+            <div class="settings-group" id="fontGroup">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+
+        <!-- Time Settings -->
+        <div class="settings-section">
+            <h3>Time</h3>
+            <div class="toggle-group">
+                <button class="toggle" id="secondsToggle"></button>
+                <label class="toggle-label">Show Seconds</label>
+            </div>
+            <div class="toggle-group">
+                <button class="toggle" id="dateToggle"></button>
+                <label class="toggle-label">Show Date</label>
+            </div>
+            <div class="select-group">
+                <label class="select-label">Format</label>
+                <select id="timeFormatSelect">
+                    <option value="12">12 Hour</option>
+                    <option value="24">24 Hour</option>
+                </select>
+            </div>
+            <div class="select-group">
+                <label class="select-label">Timezone</label>
+                <select id="timezoneSelect">
+                    <option value="local">Local</option>
+                    <option value="America/New_York">New York</option>
+                    <option value="Europe/London">London</option>
+                    <option value="Europe/Paris">Paris</option>
+                    <option value="Asia/Tokyo">Tokyo</option>
+                    <option value="Asia/Shanghai">Shanghai</option>
+                    <option value="Australia/Sydney">Sydney</option>
+                    <option value="Asia/Dubai">Dubai</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const THEMES = [
+            { name: 'Midnight', class: 'theme-midnight', bg: '#0f0f1e', gradient: '#1a1a3e', text: '#ffffff', accent: '#ffffff' },
+            { name: 'Ocean', class: 'theme-ocean', bg: '#001a33', gradient: '#004466', text: '#ffffff', accent: '#ffffff' },
+            { name: 'Aurora', class: 'theme-aurora', bg: '#0a3a52', gradient: '#16e0bd', text: '#ffffff', accent: '#ffffff' },
+            { name: 'Sunset', class: 'theme-sunset', bg: '#ff6b35', gradient: '#ffa500', text: '#000000', accent: '#000000' },
+            { name: 'Purple Space', class: 'theme-purple-space', bg: '#2d1b69', gradient: '#8f39fc', text: '#ffffff', accent: '#ffffff' },
+            { name: 'Snow', class: 'theme-snow', bg: '#f5f5f5', gradient: '#ffffff', text: '#000000', accent: '#000000' },
+            { name: 'Forest', class: 'theme-forest', bg: '#1b4332', gradient: '#52b788', text: '#ffffff', accent: '#ffffff' },
+            { name: 'Ember', class: 'theme-ember', bg: '#6a040f', gradient: '#ff006e', text: '#ffffff', accent: '#ffffff' },
+            { name: 'Gold', class: 'theme-gold', bg: '#8b7500', gradient: '#ffd700', text: '#000000', accent: '#000000' },
+            { name: 'Monochrome', class: 'theme-monochrome', bg: '#000000', gradient: '#ffffff', text: '#ffffff', accent: '#ffffff' }
+        ];
+
+        const FONTS = [
+            { name: 'Inter', class: 'font-inter' },
+            { name: 'Helvetica', class: 'font-helvetica' },
+            { name: 'Orbitron', class: 'font-orbitron' },
+            { name: 'Roboto Mono', class: 'font-roboto-mono' },
+            { name: 'Space Mono', class: 'font-space-mono' },
+            { name: 'Playfair', class: 'font-playfair' },
+            { name: 'Poppins', class: 'font-poppins' },
+            { name: 'Montserrat', class: 'font-montserrat' },
+            { name: 'Raleway', class: 'font-raleway' },
+            { name: 'Lora', class: 'font-lora' }
+        ];
+
+        // State
+        const state = {
+            mode: 'clock',
+            theme: 'Midnight',
+            font: 'Inter',
+            showSeconds: true,
+            showDate: true,
+            timeFormat: '12',
+            timezone: 'local',
+            gradientOn: false,
+            gradientMovement: false,
+            gradientStyle: 'linear',
+            timerRunning: false,
+            timerTime: 0,
+            stopwatchRunning: false,
+            stopwatchTime: 0,
+            alarmSound: 'none',
+            bgColor: '#ffffff',
+            gradientColor: '#f0f0f0',
+            textColor: '#000000',
+            accentColor: '#000000',
+            inactivityTimer: null
+        };
+
+        // DOM Elements
+        const timeDisplay = document.getElementById('time');
+        const dateDisplay = document.getElementById('date');
+        const clockDisplay = document.getElementById('clockDisplay');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const closeSettings = document.getElementById('closeSettings');
+        const controls = document.getElementById('controls');
+        const modeControls = document.getElementById('modeControls');
+        const timerControls = document.getElementById('timerControls');
+        const stopwatchControls = document.getElementById('stopwatchControls');
+        const bgColor = document.getElementById('bgColor');
+        const gradientColor = document.getElementById('gradientColor');
+        const textColor = document.getElementById('textColor');
+        const accentColor = document.getElementById('accentColor');
+        const gradientToggle = document.getElementById('gradientToggle');
+        const gradientOptions = document.getElementById('gradientOptions');
+        const gradientMovementToggle = document.getElementById('gradientMovementToggle');
+        const secondsToggle = document.getElementById('secondsToggle');
+        const dateToggle = document.getElementById('dateToggle');
+        const timeFormatSelect = document.getElementById('timeFormatSelect');
+        const timezoneSelect = document.getElementById('timezoneSelect');
+        const alarmSelect = document.getElementById('alarmSelect');
+
+        // Initialize
+        function init() {
+            loadSettings();
+            renderThemes();
+            renderFonts();
+            setupEventListeners();
+            updateClock();
+            setInterval(updateClock, 100);
+            applySettings();
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('clockSettings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                Object.assign(state, settings);
+            }
+        }
+
+        function saveSettings() {
+            localStorage.setItem('clockSettings', JSON.stringify(state));
+        }
+
+        function renderThemes() {
+            const group = document.getElementById('themeGroup');
+            group.innerHTML = THEMES.map(theme => 
+                `<div class="theme-preview ${theme.class} ${state.theme === theme.name ? 'active' : ''}" 
+                     data-theme="${theme.name}" 
+                     title="${theme.name}">Aa</div>`
+            ).join('');
+            
+            group.querySelectorAll('.theme-preview').forEach(el => {
+                el.addEventListener('click', () => selectTheme(el.dataset.theme));
+            });
+        }
+
+        function renderFonts() {
+            const group = document.getElementById('fontGroup');
+            group.innerHTML = FONTS.map(font => 
+                `<div class="font-preview ${font.class} ${state.font === font.name ? 'active' : ''}" 
+                     data-font="${font.name}">
+                    ${font.name}
+                </div>`
+            ).join('');
+            
+            group.querySelectorAll('.font-preview').forEach(el => {
+                el.addEventListener('click', () => selectFont(el.dataset.font));
+            });
+        }
+
+        function selectTheme(themeName) {
+            state.theme = themeName;
+            const theme = THEMES.find(t => t.name === themeName);
+            
+            state.bgColor = theme.bg;
+            state.gradientColor = theme.gradient;
+            state.textColor = theme.text;
+            state.accentColor = theme.accent;
+            
+            applyColors();
+            updateColorInputs();
+            
+            document.querySelectorAll('.theme-preview').forEach(el => {
+                el.classList.toggle('active', el.dataset.theme === themeName);
+            });
+            
+            saveSettings();
+        }
+
+        function selectFont(fontName) {
+            state.font = fontName;
+            const font = FONTS.find(f => f.name === fontName);
+            document.body.classList.remove(...Array.from(document.body.classList).filter(c => c.startsWith('font-')));
+            document.body.classList.add(font.class);
+            
+            document.querySelectorAll('.font-preview').forEach(el => {
+                el.classList.toggle('active', el.dataset.font === fontName);
+            });
+            
+            saveSettings();
+        }
+
+        function updateColorInputs() {
+            bgColor.value = state.bgColor;
+            gradientColor.value = state.gradientColor;
+            textColor.value = state.textColor;
+            accentColor.value = state.accentColor;
+        }
+
+        function applyColors() {
+            document.documentElement.style.setProperty('--bg-color', state.bgColor);
+            document.documentElement.style.setProperty('--gradient-color', state.gradientColor);
+            document.documentElement.style.setProperty('--text-color', state.textColor);
+            document.documentElement.style.setProperty('--accent-color', state.accentColor);
+            
+            applyThemeBackground();
+            
+            // Update all theme previews to deselect
+            document.querySelectorAll('.theme-preview').forEach(el => {
+                el.classList.remove('active');
+            });
+        }
+
+        function applyThemeBackground() {
+            const body = document.body;
+            body.classList.remove('gradient-on', 'gradient-diagonal', 'gradient-radial', 'gradient-movement-off');
+            
+            if (state.gradientOn) {
+                body.classList.add('gradient-on', `gradient-${state.gradientStyle}`);
+                if (!state.gradientMovement) {
+                    body.classList.add('gradient-movement-off');
+                }
+            }
+        }
+
+        function setupEventListeners() {
+            // Settings
+            settingsBtn.addEventListener('click', () => {
+                settingsPanel.classList.add('open');
+                showControls();
+            });
+
+            closeSettings.addEventListener('click', () => {
+                settingsPanel.classList.remove('open');
+            });
+
+            // Color pickers
+            bgColor.addEventListener('change', (e) => {
+                state.bgColor = e.target.value;
+                applyColors();
+                saveSettings();
+            });
+
+            gradientColor.addEventListener('change', (e) => {
+                state.gradientColor = e.target.value;
+                applyColors();
+                saveSettings();
+            });
+
+            textColor.addEventListener('change', (e) => {
+                state.textColor = e.target.value;
+                applyColors();
+                saveSettings();
+            });
+
+            accentColor.addEventListener('change', (e) => {
+                state.accentColor = e.target.value;
+                applyColors();
+                saveSettings();
+            });
+
+            // Gradient
+            gradientToggle.addEventListener('click', () => {
+                state.gradientOn = !state.gradientOn;
+                updateGradientToggle();
+                applyThemeBackground();
+                saveSettings();
+            });
+
+            gradientMovementToggle.addEventListener('click', () => {
+                state.gradientMovement = !state.gradientMovement;
+                updateGradientMovementToggle();
+                applyThemeBackground();
+                saveSettings();
+            });
+
+            document.querySelectorAll('.gradient-option').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.gradient-option').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    state.gradientStyle = btn.dataset.gradient;
+                    applyThemeBackground();
+                    saveSettings();
+                });
+            });
+
+            // Time settings
+            secondsToggle.addEventListener('click', () => {
+                state.showSeconds = !state.showSeconds;
+                updateSecondsToggle();
+                saveSettings();
+            });
+
+            dateToggle.addEventListener('click', () => {
+                state.showDate = !state.showDate;
+                updateDateToggle();
+                saveSettings();
+            });
+
+            timeFormatSelect.addEventListener('change', (e) => {
+                state.timeFormat = e.target.value;
+                saveSettings();
+            });
+
+            timezoneSelect.addEventListener('change', (e) => {
+                state.timezone = e.target.value;
+                saveSettings();
+            });
+
+            alarmSelect.addEventListener('change', (e) => {
+                state.alarmSound = e.target.value;
+                saveSettings();
+            });
+
+            // Mode controls
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    selectMode(btn.dataset.mode);
+                    showControls();
+                });
+            });
+
+            // Timer adjustments
+            document.querySelectorAll('[data-adjust]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const adjust = parseInt(btn.dataset.adjust);
+                    state.timerTime = Math.max(0, state.timerTime + adjust);
+                    updateClock();
+                });
+            });
+
+            // Stopwatch
+            document.getElementById('stopwatchStartBtn').addEventListener('click', startStopwatch);
+            document.getElementById('stopwatchPauseBtn').addEventListener('click', pauseStopwatch);
+            document.getElementById('stopwatchResetBtn').addEventListener('click', resetStopwatch);
+
+            // Mouse activity
+            document.addEventListener('mousemove', showControls);
+        }
+
+        function selectMode(mode) {
+            state.mode = mode;
+            
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+
+            // Show/hide mode controls
+            timerControls.classList.remove('visible');
+            stopwatchControls.classList.remove('visible');
+            
+            if (mode === 'timer') {
+                timerControls.classList.add('visible');
+            } else if (mode === 'stopwatch') {
+                stopwatchControls.classList.add('visible');
+            }
+
+            saveSettings();
+        }
+
+        function showControls() {
+            controls.classList.add('visible');
+            modeControls.classList.add('visible');
+            clearTimeout(state.inactivityTimer);
+
+            state.inactivityTimer = setTimeout(() => {
+                controls.classList.remove('visible');
+                modeControls.classList.remove('visible');
+            }, 5000);
+        }
+
+        function updateGradientToggle() {
+            if (state.gradientOn) {
+                gradientToggle.classList.add('on');
+                gradientOptions.style.display = 'block';
+            } else {
+                gradientToggle.classList.remove('on');
+                gradientOptions.style.display = 'none';
+            }
+        }
+
+        function updateGradientMovementToggle() {
+            if (state.gradientMovement) {
+                gradientMovementToggle.classList.add('on');
+            } else {
+                gradientMovementToggle.classList.remove('on');
+            }
+        }
+
+        function updateSecondsToggle() {
+            if (state.showSeconds) {
+                secondsToggle.classList.add('on');
+            } else {
+                secondsToggle.classList.remove('on');
+            }
+        }
+
+        function updateDateToggle() {
+            if (state.showDate) {
+                dateToggle.classList.add('on');
+            } else {
+                dateToggle.classList.remove('on');
+            }
+        }
+
+        function applySettings() {
+            applyColors();
+            selectFont(state.font);
+            applyThemeBackground();
+            updateSecondsToggle();
+            updateDateToggle();
+            updateGradientToggle();
+            updateGradientMovementToggle();
+            timeFormatSelect.value = state.timeFormat;
+            timezoneSelect.value = state.timezone;
+            alarmSelect.value = state.alarmSound;
+            updateColorInputs();
+        }
+
+        function updateClock() {
+            if (state.mode === 'clock') {
+                displayClock();
+            } else if (state.mode === 'timer') {
+                displayTimer();
+            } else if (state.mode === 'stopwatch') {
+                displayStopwatch();
+            }
+        }
+
+        function displayClock() {
+            let now;
+            if (state.timezone === 'local') {
+                now = new Date();
+            } else {
+                now = new Date(new Date().toLocaleString('en-US', { timeZone: state.timezone }));
+            }
+
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let seconds = now.getSeconds();
+
+            let timeStr;
+            if (state.timeFormat === '12') {
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12;
+                timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                if (state.showSeconds) timeStr += `:${String(seconds).padStart(2, '0')}`;
+                timeStr += ` ${ampm}`;
+            } else {
+                timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                if (state.showSeconds) timeStr += `:${String(seconds).padStart(2, '0')}`;
+            }
+
+            timeDisplay.textContent = timeStr;
+            updateTabTitle(timeStr);
+
+            if (state.showDate) {
+                const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+                dateDisplay.textContent = dateStr;
+            } else {
+                dateDisplay.textContent = '';
+            }
+        }
+
+        function displayTimer() {
+            const minutes = Math.floor(state.timerTime / 60);
+            const seconds = state.timerTime % 60;
+            const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            timeDisplay.textContent = timeStr;
+            dateDisplay.textContent = '';
+            updateTabTitle(`Timer ${timeStr}`);
+
+            if (state.timerTime === 0 && state.timerRunning) {
+                pauseTimer();
+                playAlarm();
+                document.title = '✓ Timer Complete';
+            }
+        }
+
+        function displayStopwatch() {
+            const minutes = Math.floor(state.stopwatchTime / 6000);
+            const seconds = Math.floor((state.stopwatchTime % 6000) / 100);
+            const centiseconds = state.stopwatchTime % 100;
+            const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(centiseconds).padStart(2, '0')}`;
+            timeDisplay.textContent = timeStr;
+            dateDisplay.textContent = '';
+            updateTabTitle(timeStr);
+        }
+
+        function updateTabTitle(title) {
+            document.title = title;
+        }
+
+        function playAlarm() {
+            if (state.alarmSound === 'none') return;
+            
+            // Create a simple beep using Web Audio API
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            switch(state.alarmSound) {
+                case 'bell':
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'sine';
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.5);
+                    break;
+                case 'chime':
+                    oscillator.frequency.value = 1000;
+                    oscillator.type = 'sine';
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.8);
+                    break;
+                case 'beep':
+                    oscillator.frequency.value = 600;
+                    oscillator.type = 'square';
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime + 0.2);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                    break;
+            }
+        }
+
+        function pauseTimer() {
+            state.timerRunning = false;
+        }
+
+        function startStopwatch() {
+            if (!state.stopwatchRunning) {
+                state.stopwatchRunning = true;
+                const interval = setInterval(() => {
+                    if (state.stopwatchRunning) {
+                        state.stopwatchTime++;
+                    } else {
+                        clearInterval(interval);
+                    }
+                }, 10);
+            }
+        }
+
+        function pauseStopwatch() {
+            state.stopwatchRunning = false;
+        }
+
+        function resetStopwatch() {
+            state.stopwatchRunning = false;
+            state.stopwatchTime = 0;
+            updateClock();
+        }
+
+        // Timer loop
+        setInterval(() => {
+            if (state.timerRunning && state.timerTime > 0) {
+                state.timerTime--;
+            }
+        }, 1000);
+
+        // Start
+        init();
+    </script>
+</body>
+</html>
