@@ -12,10 +12,13 @@
         }
 
         :root {
-            --bg-color: #ffffff;
-            --gradient-color: #f0f0f0;
-            --text-color: #000000;
-            --accent-color: #000000;
+            --bg-primary: #ffffff;
+            --bg-secondary: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --accent: #ffffff;
+            --gradient-1: #ffffff;
+            --gradient-2: #ffffff;
         }
 
         body {
@@ -23,21 +26,21 @@
             height: 100vh;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             overflow: hidden;
-            transition: background 0.3s ease;
-            background: var(--bg-color);
+            transition: all 0.3s ease;
+            background: var(--bg-primary);
         }
 
         body.gradient-on {
-            background: linear-gradient(135deg, var(--bg-color) 0%, var(--gradient-color) 100%);
+            background: linear-gradient(135deg, var(--gradient-1) 0%, var(--gradient-2) 100%);
             animation: gradientShift 15s ease infinite;
         }
 
         body.gradient-diagonal {
-            background: linear-gradient(45deg, var(--bg-color) 0%, var(--gradient-color) 100%);
+            background: linear-gradient(45deg, var(--gradient-1) 0%, var(--gradient-2) 100%);
         }
 
         body.gradient-radial {
-            background: radial-gradient(circle, var(--bg-color) 0%, var(--gradient-color) 100%);
+            background: radial-gradient(circle, var(--gradient-1) 0%, var(--gradient-2) 100%);
         }
 
         @keyframes gradientShift {
@@ -68,7 +71,7 @@
             font-size: 12vw;
             font-weight: 300;
             letter-spacing: -0.02em;
-            color: var(--text-color);
+            color: var(--text-primary);
             line-height: 1;
             margin: 0;
             font-variant-numeric: tabular-nums;
@@ -77,126 +80,11 @@
 
         .date {
             font-size: 1.5vw;
-            color: var(--text-color);
+            color: var(--text-secondary);
             margin-top: 2vw;
             letter-spacing: 0.05em;
             font-weight: 400;
-            opacity: 0.7;
             text-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Timer/Stopwatch Controls Below Clock */
-        .time-controls {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            z-index: 30;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .time-controls.visible {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .time-controls-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 50px);
-            gap: 6px;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            padding: 8px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .time-btn {
-            width: 50px;
-            height: 40px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-color);
-            font-size: 11px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: inherit;
-            font-weight: 500;
-        }
-
-        .time-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .time-btn.subtract {
-            background: rgba(255, 59, 48, 0.2);
-            border-color: rgba(255, 59, 48, 0.4);
-        }
-
-        .time-btn.subtract:hover {
-            background: rgba(255, 59, 48, 0.3);
-        }
-
-        .stopwatch-controls-row {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-        }
-
-        .stopwatch-btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-color);
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: inherit;
-            font-weight: 500;
-        }
-
-        .stopwatch-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .stopwatch-btn.primary {
-            background: var(--accent-color);
-            color: var(--bg-color);
-            border-color: var(--accent-color);
-        }
-
-        .stopwatch-btn.primary:hover {
-            opacity: 0.8;
-        }
-
-        .alarm-selector {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .alarm-selector select {
-            background: transparent;
-            border: none;
-            color: var(--text-color);
-            font-size: 12px;
-            cursor: pointer;
-            font-family: inherit;
-            outline: none;
-        }
-
-        .alarm-selector select option {
-            background: #333;
-            color: white;
         }
 
         .controls {
@@ -210,35 +98,35 @@
             justify-content: space-between;
             align-items: flex-start;
             padding: 3vmin;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
             z-index: 50;
-        }
-
-        .controls.visible {
-            opacity: 1;
-            pointer-events: all;
+            pointer-events: none;
         }
 
         .settings-btn {
             width: 50px;
             height: 50px;
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--bg-secondary);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--text-color);
+            color: var(--text-primary);
             font-size: 24px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(10px);
-            transition: all 0.2s ease;
+            transition: all 0.2s ease, opacity 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .controls.visible .settings-btn {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         .settings-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             transform: scale(1.05);
         }
 
@@ -256,8 +144,8 @@
             padding: 10px 24px;
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-color);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
             cursor: pointer;
             font-size: 14px;
             font-family: inherit;
@@ -266,13 +154,133 @@
         }
 
         .mode-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .mode-btn.active {
-            background: var(--accent-color);
-            color: var(--bg-color);
-            border-color: var(--accent-color);
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
+        }
+
+        /* On-screen Timer / Stopwatch panels (live on the main tab, not in settings) */
+        .timer-panel,
+        .stopwatch-panel {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            margin-top: 3vw;
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            max-width: 92vw;
+        }
+
+        .timer-panel.active,
+        .stopwatch-panel.active {
+            display: flex;
+        }
+
+        .timer-panel.visible,
+        .stopwatch-panel.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .stepper-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .adjust-mode-toggle {
+            display: flex;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+        }
+
+        .adjust-mode-btn {
+            padding: 8px 14px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .adjust-mode-btn.active {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+
+        .timer-chip {
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            backdrop-filter: blur(10px);
+        }
+
+        .timer-chip:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .action-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .alarm-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alarm-row .select-label {
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .alarm-select {
+            width: auto;
+            min-width: 160px;
+        }
+
+        .ctrl-btn {
+            padding: 10px 22px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            backdrop-filter: blur(10px);
+        }
+
+        .ctrl-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .ctrl-btn.primary {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
         }
 
         .settings-panel {
@@ -280,9 +288,9 @@
             top: 0;
             right: 0;
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(20px);
             border-left: 1px solid rgba(255, 255, 255, 0.1);
             transform: translateX(100%);
@@ -305,7 +313,7 @@
 
         .settings-header h2 {
             font-size: 20px;
-            color: var(--text-color);
+            color: var(--text-primary);
             font-weight: 600;
         }
 
@@ -315,7 +323,7 @@
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.1);
             border: none;
-            color: var(--text-color);
+            color: var(--text-primary);
             font-size: 24px;
             cursor: pointer;
             display: flex;
@@ -334,45 +342,17 @@
 
         .settings-section h3 {
             font-size: 12px;
-            color: var(--text-color);
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.1em;
             margin-bottom: 12px;
             font-weight: 600;
-            opacity: 0.7;
         }
 
         .settings-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
-        }
-
-        .color-picker-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .color-input-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .color-input-row label {
-            flex: 1;
-            font-size: 13px;
-            color: var(--text-color);
-        }
-
-        .color-input-row input[type="color"] {
-            width: 50px;
-            height: 44px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            cursor: pointer;
         }
 
         .theme-preview {
@@ -388,6 +368,7 @@
             justify-content: center;
             font-size: 20px;
             font-weight: 600;
+            color: white;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
@@ -396,8 +377,8 @@
         }
 
         .theme-preview.active {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
         }
 
         .font-preview {
@@ -406,7 +387,7 @@
             border: 2px solid rgba(255, 255, 255, 0.2);
             cursor: pointer;
             transition: all 0.2s ease;
-            color: var(--text-color);
+            color: var(--text-primary);
             font-size: 14px;
             text-align: center;
         }
@@ -416,7 +397,7 @@
         }
 
         .font-preview.active {
-            border-color: var(--accent-color);
+            border-color: var(--accent);
             background: rgba(255, 255, 255, 0.1);
         }
 
@@ -440,7 +421,7 @@
         }
 
         .toggle.on {
-            background: var(--accent-color);
+            background: var(--accent);
         }
 
         .toggle::after {
@@ -460,7 +441,7 @@
         }
 
         .toggle-label {
-            color: var(--text-color);
+            color: var(--text-primary);
             font-size: 14px;
         }
 
@@ -470,22 +451,27 @@
 
         .select-label {
             display: block;
-            color: var(--text-color);
-            font-size: 13px;
+            color: var(--text-primary);
+            font-size: 14px;
             margin-bottom: 8px;
         }
 
-        select {
+        select, input[type="color"] {
             width: 100%;
             padding: 10px 12px;
             border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             background: rgba(255, 255, 255, 0.1);
-            color: var(--text-color);
+            color: var(--text-primary);
             font-family: inherit;
-            font-size: 13px;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.2s ease;
+        }
+
+        input[type="color"] {
+            padding: 6px;
+            height: 44px;
         }
 
         select:hover {
@@ -494,13 +480,64 @@
 
         select:focus {
             outline: none;
-            border-color: var(--accent-color);
+            border-color: var(--accent);
             background: rgba(255, 255, 255, 0.2);
         }
 
         select option {
             background: #1a1a1a;
             color: white;
+        }
+
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .color-swatch {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 0;
+            cursor: pointer;
+            background: none;
+            overflow: hidden;
+        }
+
+        .color-swatch::-webkit-color-swatch-wrapper {
+            padding: 0;
+            border-radius: 8px;
+        }
+
+        .color-swatch::-webkit-color-swatch {
+            border: none;
+            border-radius: 8px;
+        }
+
+        .color-swatch::-moz-color-swatch {
+            border: none;
+            border-radius: 8px;
+        }
+
+        .color-row-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .color-row-info .select-label {
+            margin: 0;
+        }
+
+        .color-hex {
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
         }
 
         .gradient-options {
@@ -515,7 +552,7 @@
             border-radius: 6px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             background: rgba(255, 255, 255, 0.05);
-            color: var(--text-color);
+            color: var(--text-primary);
             font-size: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -523,9 +560,17 @@
         }
 
         .gradient-option.active {
-            background: var(--accent-color);
-            color: var(--bg-color);
-            border-color: var(--accent-color);
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
+        }
+
+        .mode-content {
+            display: none;
+        }
+
+        .mode-content.active {
+            display: block;
         }
 
         @media (max-width: 768px) {
@@ -545,8 +590,18 @@
                 grid-template-columns: 1fr;
             }
 
-            .time-controls-grid {
-                grid-template-columns: repeat(3, 50px);
+            .mode-btn {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            .stepper-row {
+                max-width: 100%;
+            }
+
+            .alarm-row {
+                flex-direction: column;
+                gap: 6px;
             }
         }
 
@@ -584,38 +639,38 @@
             <p class="date" id="date"></p>
         </div>
 
-        <!-- Timer Controls -->
-        <div class="time-controls" id="timerControls">
-            <div class="time-controls-grid">
-                <button class="time-btn subtract" data-adjust="-3600">-1h</button>
-                <button class="time-btn subtract" data-adjust="-1800">-30m</button>
-                <button class="time-btn subtract" data-adjust="-300">-5m</button>
-                <button class="time-btn subtract" data-adjust="-60">-1m</button>
-                <button class="time-btn" data-adjust="60">+1m</button>
-                <button class="time-btn" data-adjust="300">+5m</button>
-                <button class="time-btn" data-adjust="900">+15m</button>
-                <button class="time-btn" data-adjust="1800">+30m</button>
-                <button class="time-btn" data-adjust="3600">+1h</button>
-                <button class="time-btn subtract" data-adjust="-10">-10s</button>
-                <button class="time-btn subtract" data-adjust="-5">-5s</button>
-                <button class="time-btn" data-adjust="5">+5s</button>
+        <!-- Timer panel: lives on the main screen, not in settings -->
+        <div class="timer-panel" id="timerPanel">
+            <div class="stepper-row">
+                <div class="adjust-mode-toggle" id="adjustModeToggle">
+                    <button class="adjust-mode-btn active" data-adjust-mode="add">+</button>
+                    <button class="adjust-mode-btn" data-adjust-mode="subtract">−</button>
+                </div>
+                <div class="stepper-row" id="timerSteppers" style="gap: 8px;"></div>
             </div>
-            <div class="alarm-selector">
-                <select id="alarmSelect">
-                    <option value="none">🔇 No alarm</option>
-                    <option value="bell">🔔 Bell</option>
-                    <option value="chime">🎵 Chime</option>
-                    <option value="beep">📍 Beep</option>
+            <div class="action-row">
+                <button class="ctrl-btn primary" id="timerStartBtn">Start</button>
+                <button class="ctrl-btn" id="timerPauseBtn">Pause</button>
+                <button class="ctrl-btn" id="timerResetBtn">Reset</button>
+            </div>
+            <div class="alarm-row">
+                <label class="select-label">Alarm Sound</label>
+                <select id="alarmSoundSelect" class="alarm-select">
+                    <option value="beep">Classic Beep</option>
+                    <option value="digital">Digital Alarm</option>
+                    <option value="chime">Gentle Chime</option>
+                    <option value="bell">Bell</option>
                 </select>
+                <button class="ctrl-btn" id="alarmTestBtn">🔊 Test</button>
             </div>
         </div>
 
-        <!-- Stopwatch Controls -->
-        <div class="time-controls" id="stopwatchControls">
-            <div class="stopwatch-controls-row">
-                <button class="stopwatch-btn primary" id="stopwatchStartBtn">Start</button>
-                <button class="stopwatch-btn" id="stopwatchPauseBtn">Pause</button>
-                <button class="stopwatch-btn" id="stopwatchResetBtn">Reset</button>
+        <!-- Stopwatch panel: lives on the main screen, not in settings -->
+        <div class="stopwatch-panel" id="stopwatchPanel">
+            <div class="action-row">
+                <button class="ctrl-btn primary" id="stopwatchStartBtn">Start</button>
+                <button class="ctrl-btn" id="stopwatchStopBtn">Stop</button>
+                <button class="ctrl-btn" id="stopwatchResetBtn">Reset</button>
             </div>
         </div>
     </div>
@@ -637,35 +692,51 @@
             <button class="close-btn" id="closeSettings">&times;</button>
         </div>
 
-        <!-- Custom Colors -->
-        <div class="settings-section">
-            <h3>Colors</h3>
-            <div class="color-picker-group">
-                <div class="color-input-row">
-                    <label>Background</label>
-                    <input type="color" id="bgColor" value="#ffffff">
-                </div>
-                <div class="color-input-row">
-                    <label>Gradient</label>
-                    <input type="color" id="gradientColor" value="#f0f0f0">
-                </div>
-                <div class="color-input-row">
-                    <label>Text</label>
-                    <input type="color" id="textColor" value="#000000">
-                </div>
-                <div class="color-input-row">
-                    <label>Accent</label>
-                    <input type="color" id="accentColor" value="#000000">
-                </div>
-            </div>
-        </div>
-
-        <!-- Preset Themes -->
+        <!-- Themes -->
         <div class="settings-section">
             <h3>Preset Themes</h3>
             <div class="settings-group" id="themeGroup">
                 <!-- Generated by JS -->
             </div>
+        </div>
+
+        <!-- Custom Colors -->
+        <div class="settings-section">
+            <h3>Custom Colors</h3>
+
+            <div class="color-row">
+                <input type="color" id="customBgColor" class="color-swatch">
+                <div class="color-row-info">
+                    <label class="select-label">Background color</label>
+                    <span class="color-hex" id="customBgColorHex">#000000</span>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <input type="color" id="customGradientColor" class="color-swatch">
+                <div class="color-row-info">
+                    <label class="select-label">Secondary / background gradient color</label>
+                    <span class="color-hex" id="customGradientColorHex">#000000</span>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <input type="color" id="customTextColor" class="color-swatch">
+                <div class="color-row-info">
+                    <label class="select-label">Text color</label>
+                    <span class="color-hex" id="customTextColorHex">#000000</span>
+                </div>
+            </div>
+
+            <div class="color-row">
+                <input type="color" id="customAccentColor" class="color-swatch">
+                <div class="color-row-info">
+                    <label class="select-label">Accent color</label>
+                    <span class="color-hex" id="customAccentColorHex">#000000</span>
+                </div>
+            </div>
+
+            <button class="ctrl-btn" id="resetColorsBtn" style="width: 100%;">Reset to Theme Colors</button>
         </div>
 
         <!-- Gradient -->
@@ -680,7 +751,7 @@
                     <button class="toggle" id="gradientMovementToggle"></button>
                     <label class="toggle-label">Animate Gradient</label>
                 </div>
-                <label class="settings-label" style="display: block; color: var(--text-color); font-size: 12px; margin-bottom: 8px;">Style</label>
+                <label class="settings-label" style="display: block; color: var(--text-primary); font-size: 12px; margin-bottom: 8px;">Style</label>
                 <div class="gradient-options">
                     <button class="gradient-option active" data-gradient="linear">Linear</button>
                     <button class="gradient-option" data-gradient="diagonal">Diagonal</button>
@@ -719,13 +790,6 @@
                 <label class="select-label">Timezone</label>
                 <select id="timezoneSelect">
                     <option value="local">Local</option>
-                    <option value="America/New_York">New York</option>
-                    <option value="Europe/London">London</option>
-                    <option value="Europe/Paris">Paris</option>
-                    <option value="Asia/Tokyo">Tokyo</option>
-                    <option value="Asia/Shanghai">Shanghai</option>
-                    <option value="Australia/Sydney">Sydney</option>
-                    <option value="Asia/Dubai">Dubai</option>
                 </select>
             </div>
         </div>
@@ -733,16 +797,16 @@
 
     <script>
         const THEMES = [
-            { name: 'Midnight', class: 'theme-midnight', bg: '#0f0f1e', gradient: '#1a1a3e', text: '#ffffff', accent: '#ffffff' },
-            { name: 'Ocean', class: 'theme-ocean', bg: '#001a33', gradient: '#004466', text: '#ffffff', accent: '#ffffff' },
-            { name: 'Aurora', class: 'theme-aurora', bg: '#0a3a52', gradient: '#16e0bd', text: '#ffffff', accent: '#ffffff' },
-            { name: 'Sunset', class: 'theme-sunset', bg: '#ff6b35', gradient: '#ffa500', text: '#000000', accent: '#000000' },
-            { name: 'Purple Space', class: 'theme-purple-space', bg: '#2d1b69', gradient: '#8f39fc', text: '#ffffff', accent: '#ffffff' },
-            { name: 'Snow', class: 'theme-snow', bg: '#f5f5f5', gradient: '#ffffff', text: '#000000', accent: '#000000' },
-            { name: 'Forest', class: 'theme-forest', bg: '#1b4332', gradient: '#52b788', text: '#ffffff', accent: '#ffffff' },
-            { name: 'Ember', class: 'theme-ember', bg: '#6a040f', gradient: '#ff006e', text: '#ffffff', accent: '#ffffff' },
-            { name: 'Gold', class: 'theme-gold', bg: '#8b7500', gradient: '#ffd700', text: '#000000', accent: '#000000' },
-            { name: 'Monochrome', class: 'theme-monochrome', bg: '#000000', gradient: '#ffffff', text: '#ffffff', accent: '#ffffff' }
+            { name: 'Midnight', class: 'theme-midnight', textColor: '#ffffff', textSecondary: 'rgba(255,255,255,0.7)', gradient1: '#0f0f1e', gradient2: '#1a1a3e' },
+            { name: 'Ocean', class: 'theme-ocean', textColor: '#ffffff', textSecondary: 'rgba(255,255,255,0.7)', gradient1: '#001a33', gradient2: '#004466' },
+            { name: 'Aurora', class: 'theme-aurora', textColor: '#ffffff', textSecondary: 'rgba(255,255,255,0.7)', gradient1: '#0a3a52', gradient2: '#16e0bd' },
+            { name: 'Sunset', class: 'theme-sunset', textColor: '#000000', textSecondary: 'rgba(0,0,0,0.6)', gradient1: '#ff6b35', gradient2: '#ffa500' },
+            { name: 'Purple Space', class: 'theme-purple-space', textColor: '#ffffff', textSecondary: 'rgba(255,255,255,0.7)', gradient1: '#2d1b69', gradient2: '#8f39fc' },
+            { name: 'Snow', class: 'theme-snow', textColor: '#000000', textSecondary: 'rgba(0,0,0,0.6)', gradient1: '#f5f5f5', gradient2: '#ffffff' },
+            { name: 'Forest', class: 'theme-forest', textColor: '#ffffff', textSecondary: 'rgba(255,255,255,0.7)', gradient1: '#1b4332', gradient2: '#52b788' },
+            { name: 'Ember', class: 'theme-ember', textColor: '#ffffff', textSecondary: 'rgba(255,255,255,0.7)', gradient1: '#6a040f', gradient2: '#ff006e' },
+            { name: 'Gold', class: 'theme-gold', textColor: '#000000', textSecondary: 'rgba(0,0,0,0.6)', gradient1: '#8b7500', gradient2: '#ffd700' },
+            { name: 'Monochrome', class: 'theme-monochrome', textColor: '#ffffff', textSecondary: 'rgba(255,255,255,0.7)', gradient1: '#000000', gradient2: '#ffffff' }
         ];
 
         const FONTS = [
@@ -771,15 +835,18 @@
             gradientMovement: false,
             gradientStyle: 'linear',
             timerRunning: false,
-            timerTime: 0,
+            timerRemaining: 0,
+            timerEndTime: 0,
+            timerAdjustMode: 'add',
+            alarmSound: 'beep',
             stopwatchRunning: false,
             stopwatchTime: 0,
-            alarmSound: 'none',
-            bgColor: '#ffffff',
-            gradientColor: '#f0f0f0',
-            textColor: '#000000',
-            accentColor: '#000000',
-            inactivityTimer: null
+            controlsVisible: false,
+            inactivityTimer: null,
+            customBgColor: null,
+            customGradientColor: null,
+            customTextColor: null,
+            customAccentColor: null
         };
 
         // DOM Elements
@@ -791,12 +858,9 @@
         const closeSettings = document.getElementById('closeSettings');
         const controls = document.getElementById('controls');
         const modeControls = document.getElementById('modeControls');
-        const timerControls = document.getElementById('timerControls');
-        const stopwatchControls = document.getElementById('stopwatchControls');
-        const bgColor = document.getElementById('bgColor');
-        const gradientColor = document.getElementById('gradientColor');
-        const textColor = document.getElementById('textColor');
-        const accentColor = document.getElementById('accentColor');
+        const timerPanel = document.getElementById('timerPanel');
+        const stopwatchPanel = document.getElementById('stopwatchPanel');
+        const alarmSoundSelect = document.getElementById('alarmSoundSelect');
         const gradientToggle = document.getElementById('gradientToggle');
         const gradientOptions = document.getElementById('gradientOptions');
         const gradientMovementToggle = document.getElementById('gradientMovementToggle');
@@ -804,14 +868,21 @@
         const dateToggle = document.getElementById('dateToggle');
         const timeFormatSelect = document.getElementById('timeFormatSelect');
         const timezoneSelect = document.getElementById('timezoneSelect');
-        const alarmSelect = document.getElementById('alarmSelect');
+        const customBgColor = document.getElementById('customBgColor');
+        const customGradientColor = document.getElementById('customGradientColor');
+        const customTextColor = document.getElementById('customTextColor');
+        const customAccentColor = document.getElementById('customAccentColor');
+        const resetColorsBtn = document.getElementById('resetColorsBtn');
 
         // Initialize
         function init() {
             loadSettings();
             renderThemes();
             renderFonts();
+            renderTimerSteppers();
+            renderTimezones();
             setupEventListeners();
+            selectMode(state.mode);
             updateClock();
             setInterval(updateClock, 100);
             applySettings();
@@ -826,7 +897,24 @@
         }
 
         function saveSettings() {
-            localStorage.setItem('clockSettings', JSON.stringify(state));
+            const toSave = {
+                theme: state.theme,
+                font: state.font,
+                showSeconds: state.showSeconds,
+                showDate: state.showDate,
+                timeFormat: state.timeFormat,
+                timezone: state.timezone,
+                gradientOn: state.gradientOn,
+                gradientMovement: state.gradientMovement,
+                gradientStyle: state.gradientStyle,
+                mode: state.mode,
+                alarmSound: state.alarmSound,
+                customBgColor: state.customBgColor,
+                customGradientColor: state.customGradientColor,
+                customTextColor: state.customTextColor,
+                customAccentColor: state.customAccentColor
+            };
+            localStorage.setItem('clockSettings', JSON.stringify(toSave));
         }
 
         function renderThemes() {
@@ -856,22 +944,103 @@
             });
         }
 
+        const TIMER_STEPS = [
+            { label: '1s', seconds: 1 },
+            { label: '10s', seconds: 10 },
+            { label: '30s', seconds: 30 },
+            { label: '1m', seconds: 60 },
+            { label: '5m', seconds: 300 },
+            { label: '15m', seconds: 900 },
+            { label: '30m', seconds: 1800 },
+            { label: '1h', seconds: 3600 }
+        ];
+
+        function renderTimerSteppers() {
+            const container = document.getElementById('timerSteppers');
+            container.innerHTML = TIMER_STEPS.map(step => `
+                <button class="timer-chip" data-seconds="${step.seconds}">${step.label}</button>
+            `).join('');
+
+            container.querySelectorAll('.timer-chip').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const seconds = parseInt(btn.dataset.seconds, 10);
+                    const delta = state.timerAdjustMode === 'subtract' ? -seconds : seconds;
+                    adjustTimer(delta);
+                    showControls();
+                });
+            });
+
+            document.querySelectorAll('.adjust-mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    state.timerAdjustMode = btn.dataset.adjustMode;
+                    document.querySelectorAll('.adjust-mode-btn').forEach(b => {
+                        b.classList.toggle('active', b.dataset.adjustMode === state.timerAdjustMode);
+                    });
+                });
+            });
+        }
+
+        function adjustTimer(deltaSeconds) {
+            if (state.timerRunning) {
+                state.timerEndTime += deltaSeconds * 1000;
+                const remainingNow = Math.round((state.timerEndTime - Date.now()) / 1000);
+                if (remainingNow <= 0) {
+                    state.timerRunning = false;
+                    state.timerRemaining = 0;
+                }
+            } else {
+                state.timerRemaining = Math.max(0, state.timerRemaining + deltaSeconds);
+            }
+            updateClock();
+        }
+
+        const FALLBACK_TIMEZONES = [
+            'UTC', 'Africa/Cairo', 'Africa/Johannesburg', 'Africa/Lagos', 'Africa/Nairobi',
+            'America/Anchorage', 'America/Argentina/Buenos_Aires', 'America/Bogota', 'America/Chicago',
+            'America/Denver', 'America/Halifax', 'America/Los_Angeles', 'America/Mexico_City',
+            'America/New_York', 'America/Phoenix', 'America/Sao_Paulo', 'America/St_Johns',
+            'America/Toronto', 'America/Vancouver', 'Asia/Bangkok', 'Asia/Dhaka', 'Asia/Dubai',
+            'Asia/Hong_Kong', 'Asia/Istanbul', 'Asia/Jakarta', 'Asia/Jerusalem', 'Asia/Kabul',
+            'Asia/Karachi', 'Asia/Kolkata', 'Asia/Kuala_Lumpur', 'Asia/Manila', 'Asia/Riyadh',
+            'Asia/Seoul', 'Asia/Shanghai', 'Asia/Singapore', 'Asia/Taipei', 'Asia/Tehran',
+            'Asia/Tokyo', 'Atlantic/Reykjavik', 'Australia/Adelaide', 'Australia/Brisbane',
+            'Australia/Melbourne', 'Australia/Perth', 'Australia/Sydney', 'Europe/Amsterdam',
+            'Europe/Athens', 'Europe/Berlin', 'Europe/Dublin', 'Europe/Helsinki', 'Europe/Lisbon',
+            'Europe/London', 'Europe/Madrid', 'Europe/Moscow', 'Europe/Paris', 'Europe/Prague',
+            'Europe/Rome', 'Europe/Stockholm', 'Europe/Vienna', 'Europe/Warsaw', 'Europe/Zurich',
+            'Pacific/Auckland', 'Pacific/Fiji', 'Pacific/Honolulu'
+        ];
+
+        function getAllTimezones() {
+            if (typeof Intl.supportedValuesOf === 'function') {
+                try {
+                    const zones = Intl.supportedValuesOf('timeZone');
+                    if (zones && zones.length) return zones;
+                } catch (e) { /* fall through to fallback list */ }
+            }
+            return FALLBACK_TIMEZONES;
+        }
+
+        function renderTimezones() {
+            const zones = getAllTimezones();
+            timezoneSelect.innerHTML = '<option value="local">Local</option>' +
+                zones.map(zone => `<option value="${zone}">${zone.replace(/_/g, ' ')}</option>`).join('');
+        }
+
         function selectTheme(themeName) {
             state.theme = themeName;
-            const theme = THEMES.find(t => t.name === themeName);
-            
-            state.bgColor = theme.bg;
-            state.gradientColor = theme.gradient;
-            state.textColor = theme.text;
-            state.accentColor = theme.accent;
-            
-            applyColors();
-            updateColorInputs();
-            
+
+            // Choosing a preset resets custom overrides, same as picking a new Discord theme
+            state.customBgColor = null;
+            state.customGradientColor = null;
+            state.customTextColor = null;
+            state.customAccentColor = null;
+
             document.querySelectorAll('.theme-preview').forEach(el => {
                 el.classList.toggle('active', el.dataset.theme === themeName);
             });
-            
+
+            applySettings();
             saveSettings();
         }
 
@@ -888,25 +1057,43 @@
             saveSettings();
         }
 
-        function updateColorInputs() {
-            bgColor.value = state.bgColor;
-            gradientColor.value = state.gradientColor;
-            textColor.value = state.textColor;
-            accentColor.value = state.accentColor;
-        }
+        function updateCustomColor(colorType, hexColor) {
+            // Each custom color is independent — setting one never touches the others,
+            // and background color applies whether or not the gradient is on.
+            state[colorType] = hexColor;
 
-        function applyColors() {
-            document.documentElement.style.setProperty('--bg-color', state.bgColor);
-            document.documentElement.style.setProperty('--gradient-color', state.gradientColor);
-            document.documentElement.style.setProperty('--text-color', state.textColor);
-            document.documentElement.style.setProperty('--accent-color', state.accentColor);
-            
-            applyThemeBackground();
-            
-            // Update all theme previews to deselect
             document.querySelectorAll('.theme-preview').forEach(el => {
                 el.classList.remove('active');
             });
+
+            applySettings();
+            saveSettings();
+        }
+
+        function hexToRgba(hex, alpha) {
+            let h = (hex || '#ffffff').replace('#', '');
+            if (h.length === 3) h = h.split('').map(c => c + c).join('');
+            const num = parseInt(h, 16);
+            const r = (num >> 16) & 255, g = (num >> 8) & 255, b = num & 255;
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        function updateColorInputs() {
+            const theme = THEMES.find(t => t.name === state.theme) || THEMES[0];
+            const bg = state.customBgColor || theme.gradient1;
+            const grad = state.customGradientColor || theme.gradient2;
+            const text = state.customTextColor || theme.textColor;
+            const accent = state.customAccentColor || theme.textColor;
+
+            customBgColor.value = bg;
+            customGradientColor.value = grad;
+            customTextColor.value = text;
+            customAccentColor.value = accent;
+
+            document.getElementById('customBgColorHex').textContent = bg.toUpperCase();
+            document.getElementById('customGradientColorHex').textContent = grad.toUpperCase();
+            document.getElementById('customTextColorHex').textContent = text.toUpperCase();
+            document.getElementById('customAccentColorHex').textContent = accent.toUpperCase();
         }
 
         function applyThemeBackground() {
@@ -932,28 +1119,26 @@
                 settingsPanel.classList.remove('open');
             });
 
-            // Color pickers
-            bgColor.addEventListener('change', (e) => {
-                state.bgColor = e.target.value;
-                applyColors();
-                saveSettings();
+            // Custom colors
+            customBgColor.addEventListener('change', (e) => {
+                updateCustomColor('customBgColor', e.target.value);
+            });
+            customGradientColor.addEventListener('change', (e) => {
+                updateCustomColor('customGradientColor', e.target.value);
+            });
+            customTextColor.addEventListener('change', (e) => {
+                updateCustomColor('customTextColor', e.target.value);
+            });
+            customAccentColor.addEventListener('change', (e) => {
+                updateCustomColor('customAccentColor', e.target.value);
             });
 
-            gradientColor.addEventListener('change', (e) => {
-                state.gradientColor = e.target.value;
-                applyColors();
-                saveSettings();
-            });
-
-            textColor.addEventListener('change', (e) => {
-                state.textColor = e.target.value;
-                applyColors();
-                saveSettings();
-            });
-
-            accentColor.addEventListener('change', (e) => {
-                state.accentColor = e.target.value;
-                applyColors();
+            resetColorsBtn.addEventListener('click', () => {
+                state.customBgColor = null;
+                state.customGradientColor = null;
+                state.customTextColor = null;
+                state.customAccentColor = null;
+                applySettings();
                 saveSettings();
             });
 
@@ -1005,11 +1190,6 @@
                 saveSettings();
             });
 
-            alarmSelect.addEventListener('change', (e) => {
-                state.alarmSound = e.target.value;
-                saveSettings();
-            });
-
             // Mode controls
             document.querySelectorAll('.mode-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -1018,19 +1198,42 @@
                 });
             });
 
-            // Timer adjustments
-            document.querySelectorAll('[data-adjust]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const adjust = parseInt(btn.dataset.adjust);
-                    state.timerTime = Math.max(0, state.timerTime + adjust);
-                    updateClock();
-                });
+            // Timer on-tab controls
+            document.getElementById('timerStartBtn').addEventListener('click', () => {
+                startTimer();
+                showControls();
+            });
+            document.getElementById('timerPauseBtn').addEventListener('click', () => {
+                pauseTimer();
+                showControls();
+            });
+            document.getElementById('timerResetBtn').addEventListener('click', () => {
+                resetTimer();
+                showControls();
             });
 
-            // Stopwatch
-            document.getElementById('stopwatchStartBtn').addEventListener('click', startStopwatch);
-            document.getElementById('stopwatchPauseBtn').addEventListener('click', pauseStopwatch);
-            document.getElementById('stopwatchResetBtn').addEventListener('click', resetStopwatch);
+            alarmSoundSelect.addEventListener('change', (e) => {
+                state.alarmSound = e.target.value;
+                saveSettings();
+            });
+
+            document.getElementById('alarmTestBtn').addEventListener('click', () => {
+                playAlarmSound(state.alarmSound, 1);
+            });
+
+            // Stopwatch on-tab controls
+            document.getElementById('stopwatchStartBtn').addEventListener('click', () => {
+                startStopwatch();
+                showControls();
+            });
+            document.getElementById('stopwatchStopBtn').addEventListener('click', () => {
+                pauseStopwatch();
+                showControls();
+            });
+            document.getElementById('stopwatchResetBtn').addEventListener('click', () => {
+                resetStopwatch();
+                showControls();
+            });
 
             // Mouse activity
             document.addEventListener('mousemove', showControls);
@@ -1038,20 +1241,14 @@
 
         function selectMode(mode) {
             state.mode = mode;
-            
+
             document.querySelectorAll('.mode-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.mode === mode);
             });
 
-            // Show/hide mode controls
-            timerControls.classList.remove('visible');
-            stopwatchControls.classList.remove('visible');
-            
-            if (mode === 'timer') {
-                timerControls.classList.add('visible');
-            } else if (mode === 'stopwatch') {
-                stopwatchControls.classList.add('visible');
-            }
+            // Show the matching on-tab control panel
+            timerPanel.classList.toggle('active', mode === 'timer');
+            stopwatchPanel.classList.toggle('active', mode === 'stopwatch');
 
             saveSettings();
         }
@@ -1059,11 +1256,16 @@
         function showControls() {
             controls.classList.add('visible');
             modeControls.classList.add('visible');
+            timerPanel.classList.add('visible');
+            stopwatchPanel.classList.add('visible');
             clearTimeout(state.inactivityTimer);
 
+            // Only the buttons/controls fade out from inactivity — the time itself always stays fully visible
             state.inactivityTimer = setTimeout(() => {
                 controls.classList.remove('visible');
                 modeControls.classList.remove('visible');
+                timerPanel.classList.remove('visible');
+                stopwatchPanel.classList.remove('visible');
             }, 5000);
         }
 
@@ -1102,16 +1304,42 @@
         }
 
         function applySettings() {
-            applyColors();
+            // Layer: theme provides the defaults, each custom color independently overrides
+            // just its own slot. Background color now always applies (--bg-primary is the
+            // solid fallback), whether or not the gradient is toggled on.
+            const theme = THEMES.find(t => t.name === state.theme) || THEMES[0];
+
+            const bg = state.customBgColor || theme.gradient1;
+            const grad = state.customGradientColor || theme.gradient2;
+            const text = state.customTextColor || theme.textColor;
+            const textSecondary = state.customTextColor ? hexToRgba(state.customTextColor, 0.7) : theme.textSecondary;
+            const accent = state.customAccentColor || theme.textColor;
+
+            document.documentElement.style.setProperty('--bg-primary', bg);
+            document.documentElement.style.setProperty('--gradient-1', bg);
+            document.documentElement.style.setProperty('--gradient-2', grad);
+            document.documentElement.style.setProperty('--text-primary', text);
+            document.documentElement.style.setProperty('--text-secondary', textSecondary);
+            document.documentElement.style.setProperty('--accent', accent);
+
+            // Apply font
             selectFont(state.font);
+
+            // Apply background
             applyThemeBackground();
+
+            // Apply toggles
             updateSecondsToggle();
             updateDateToggle();
             updateGradientToggle();
             updateGradientMovementToggle();
+
+            // Apply selects
             timeFormatSelect.value = state.timeFormat;
             timezoneSelect.value = state.timezone;
-            alarmSelect.value = state.alarmSound;
+            alarmSoundSelect.value = state.alarmSound;
+            
+            // Apply color inputs
             updateColorInputs();
         }
 
@@ -1160,19 +1388,37 @@
             }
         }
 
+        function formatDuration(totalSeconds) {
+            const h = Math.floor(totalSeconds / 3600);
+            const m = Math.floor((totalSeconds % 3600) / 60);
+            const s = totalSeconds % 60;
+            if (h > 0) {
+                return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            }
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
         function displayTimer() {
-            const minutes = Math.floor(state.timerTime / 60);
-            const seconds = state.timerTime % 60;
-            const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            let remaining = state.timerRemaining;
+
+            if (state.timerRunning) {
+                remaining = Math.round((state.timerEndTime - Date.now()) / 1000);
+                if (remaining <= 0) {
+                    remaining = 0;
+                    state.timerRunning = false;
+                    state.timerRemaining = 0;
+                    playAlarmSound();
+                    document.title = "⏰ Time's up!";
+                    showControls();
+                } else {
+                    state.timerRemaining = remaining;
+                }
+            }
+
+            const timeStr = formatDuration(remaining);
             timeDisplay.textContent = timeStr;
             dateDisplay.textContent = '';
-            updateTabTitle(`Timer ${timeStr}`);
-
-            if (state.timerTime === 0 && state.timerRunning) {
-                pauseTimer();
-                playAlarm();
-                document.title = '✓ Timer Complete';
-            }
+            if (state.timerRunning) updateTabTitle(`Timer ${timeStr}`);
         }
 
         function displayStopwatch() {
@@ -1189,47 +1435,24 @@
             document.title = title;
         }
 
-        function playAlarm() {
-            if (state.alarmSound === 'none') return;
-            
-            // Create a simple beep using Web Audio API
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            switch(state.alarmSound) {
-                case 'bell':
-                    oscillator.frequency.value = 800;
-                    oscillator.type = 'sine';
-                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-                    oscillator.start(audioContext.currentTime);
-                    oscillator.stop(audioContext.currentTime + 0.5);
-                    break;
-                case 'chime':
-                    oscillator.frequency.value = 1000;
-                    oscillator.type = 'sine';
-                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
-                    oscillator.start(audioContext.currentTime);
-                    oscillator.stop(audioContext.currentTime + 0.8);
-                    break;
-                case 'beep':
-                    oscillator.frequency.value = 600;
-                    oscillator.type = 'square';
-                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-                    gainNode.gain.setValueAtTime(0, audioContext.currentTime + 0.2);
-                    oscillator.start(audioContext.currentTime);
-                    oscillator.stop(audioContext.currentTime + 0.2);
-                    break;
-            }
+        function startTimer() {
+            if (state.timerRemaining <= 0) return;
+            state.timerRunning = true;
+            state.timerEndTime = Date.now() + state.timerRemaining * 1000;
+            updateClock();
         }
 
         function pauseTimer() {
+            if (state.timerRunning) {
+                state.timerRemaining = Math.max(0, Math.round((state.timerEndTime - Date.now()) / 1000));
+            }
             state.timerRunning = false;
+        }
+
+        function resetTimer() {
+            state.timerRunning = false;
+            state.timerRemaining = 0;
+            updateClock();
         }
 
         function startStopwatch() {
@@ -1255,12 +1478,52 @@
             updateClock();
         }
 
-        // Timer loop
-        setInterval(() => {
-            if (state.timerRunning && state.timerTime > 0) {
-                state.timerTime--;
+        // --- Alarm sound synthesis (Web Audio API — no external files needed) ---
+        let audioCtx = null;
+
+        function getAudioCtx() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
-        }, 1000);
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+
+        function beepTone(ctx, freq, startTime, duration, type, gainVal) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = type;
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(gainVal, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+        }
+
+        function playAlarmSound(soundType, repeats) {
+            const ctx = getAudioCtx();
+            const sound = soundType || state.alarmSound;
+            const count = repeats || 4;
+            const now = ctx.currentTime;
+
+            for (let i = 0; i < count; i++) {
+                const t = now + i * 0.9;
+                if (sound === 'beep') {
+                    beepTone(ctx, 880, t, 0.25, 'square', 0.25);
+                } else if (sound === 'digital') {
+                    beepTone(ctx, 600, t, 0.12, 'square', 0.25);
+                    beepTone(ctx, 900, t + 0.15, 0.12, 'square', 0.25);
+                } else if (sound === 'chime') {
+                    beepTone(ctx, 1046, t, 0.5, 'sine', 0.25);
+                    beepTone(ctx, 1318, t + 0.1, 0.5, 'sine', 0.15);
+                } else if (sound === 'bell') {
+                    beepTone(ctx, 988, t, 0.6, 'sine', 0.3);
+                    beepTone(ctx, 1976, t, 0.6, 'sine', 0.1);
+                }
+            }
+        }
 
         // Start
         init();
