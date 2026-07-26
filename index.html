@@ -424,7 +424,7 @@
             stroke: var(--accent);
             stroke-width: 3;
             stroke-linecap: round;
-            transition: stroke-dashoffset 0.3s linear, opacity 0.3s ease;
+            transition: opacity 0.3s ease;
         }
 
         .timer-units-col {
@@ -439,7 +439,7 @@
         .timer-units {
             display: flex;
             align-items: center;
-            gap: clamp(4px, 0.6vw, 12px);
+            gap: clamp(6px, 0.8vw, 14px);
         }
 
         .timer-unit {
@@ -457,7 +457,7 @@
 
         .unit-value {
             font-family: inherit;
-            font-size: clamp(36px, 6vw, 76px);
+            font-size: clamp(40px, 7vw, 84px);
             font-weight: 300;
             color: var(--text-primary);
             background: transparent;
@@ -496,8 +496,8 @@
             color: var(--text-secondary);
             font-size: clamp(18px, 1.8vw, 24px);
             cursor: pointer;
-            width: clamp(28px, 2.2vw, 38px);
-            height: clamp(28px, 2.2vw, 38px);
+            width: clamp(30px, 2.4vw, 40px);
+            height: clamp(30px, 2.4vw, 40px);
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -526,8 +526,8 @@
         }
 
         .timer-colon span {
-            width: clamp(5px, 0.4vw, 7px);
-            height: clamp(5px, 0.4vw, 7px);
+            width: clamp(6px, 0.5vw, 8px);
+            height: clamp(6px, 0.5vw, 8px);
             border-radius: 50%;
             background: var(--text-primary);
             opacity: 0.8;
@@ -927,6 +927,7 @@
             timerRunning: false,
             timerTime: 0,
             timerTotal: 0,
+            timerEndTime: 0,
             stopwatchRunning: false,
             stopwatchTime: 0,
             controlsVisible: false,
@@ -969,7 +970,6 @@
             setupEventListeners();
             updateClock();
             setInterval(updateClock, 100);
-            setInterval(tickTimer, 1000);
             applySettings();
             refreshTimerFromInputs();
             selectMode(state.mode);
@@ -1162,344 +1162,4 @@
             });
 
             [hoursInput, minutesInput, secondsInput].forEach(input => {
-                input.addEventListener('focus', () => input.select());
-
-                input.addEventListener('input', () => {
-                    input.value = input.value.replace(/\D/g, '').slice(0, 2);
-                });
-
-                input.addEventListener('change', () => {
-                    refreshTimerFromInputs();
-                });
-
-                input.addEventListener('blur', () => {
-                    refreshTimerFromInputs();
-                });
-
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') input.blur();
-                });
-            });
-
-            // Stopwatch
-            stopwatchStartBtn.addEventListener('click', startStopwatch);
-            stopwatchPauseBtn.addEventListener('click', pauseStopwatch);
-            stopwatchResetBtn.addEventListener('click', resetStopwatch);
-
-            // Mouse activity
-            document.addEventListener('mousemove', showControls);
-        }
-
-        function selectMode(mode) {
-            state.mode = mode;
-            
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.mode === mode);
-            });
-
-            document.querySelectorAll('.mode-content').forEach(el => {
-                el.classList.remove('active');
-            });
-
-            if (mode === 'stopwatch') {
-                document.getElementById('stopwatchSettings').classList.add('active');
-            }
-
-            clockDisplayEl.style.display = mode === 'timer' ? 'none' : '';
-            timerDisplayEl.classList.toggle('active', mode === 'timer');
-
-            if (mode === 'timer') {
-                requestAnimationFrame(sizeTimerRing);
-            }
-
-            saveSettings();
-        }
-
-        function showControls() {
-            controls.classList.add('visible');
-            modeControls.classList.remove('dimmed');
-            clearTimeout(state.inactivityTimer);
-
-            state.inactivityTimer = setTimeout(() => {
-                controls.classList.remove('visible');
-                modeControls.classList.add('dimmed');
-            }, 5000);
-        }
-
-        function updateGradientToggle() {
-            if (state.gradientOn) {
-                gradientToggle.classList.add('on');
-                gradientOptions.style.display = 'block';
-            } else {
-                gradientToggle.classList.remove('on');
-                gradientOptions.style.display = 'none';
-            }
-        }
-
-        function updateGradientMovementToggle() {
-            if (state.gradientMovement) {
-                gradientMovementToggle.classList.add('on');
-            } else {
-                gradientMovementToggle.classList.remove('on');
-            }
-        }
-
-        function updateSecondsToggle() {
-            if (state.showSeconds) {
-                secondsToggle.classList.add('on');
-            } else {
-                secondsToggle.classList.remove('on');
-            }
-        }
-
-        function updateDateToggle() {
-            if (state.showDate) {
-                dateToggle.classList.add('on');
-            } else {
-                dateToggle.classList.remove('on');
-            }
-        }
-
-        function applySettings() {
-            selectTheme(state.theme);
-            selectFont(state.font);
-            applyThemeBackground();
-            updateSecondsToggle();
-            updateDateToggle();
-            updateGradientToggle();
-            updateGradientMovementToggle();
-
-            timeFormatSelect.value = state.timeFormat;
-            timezoneSelect.value = state.timezone;
-        }
-
-        function updateClock() {
-            if (state.mode === 'clock') {
-                displayClock();
-            } else if (state.mode === 'stopwatch') {
-                displayStopwatch();
-            }
-        }
-
-        function displayClock() {
-            let now;
-            if (state.timezone === 'local') {
-                now = new Date();
-            } else {
-                now = new Date(new Date().toLocaleString('en-US', { timeZone: state.timezone }));
-            }
-
-            let hours = now.getHours();
-            let minutes = now.getMinutes();
-            let seconds = now.getSeconds();
-
-            let timeStr;
-            if (state.timeFormat === '12') {
-                const ampm = hours >= 12 ? 'PM' : 'AM';
-                hours = hours % 12 || 12;
-                timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-                if (state.showSeconds) timeStr += `:${String(seconds).padStart(2, '0')}`;
-                timeStr += ` ${ampm}`;
-            } else {
-                timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-                if (state.showSeconds) timeStr += `:${String(seconds).padStart(2, '0')}`;
-            }
-
-            timeDisplay.textContent = timeStr;
-            updateTabTitle(timeStr);
-
-            if (state.showDate) {
-                const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-                dateDisplay.textContent = dateStr;
-            } else {
-                dateDisplay.textContent = '';
-            }
-        }
-
-        const RING_RADIUS = 140;
-        const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
-
-        function sizeTimerRing() {
-            const col = document.querySelector('.timer-units-col');
-            const wrap = document.querySelector('.timer-ring-wrap');
-            if (!col || !wrap) return;
-            const rect = col.getBoundingClientRect();
-            if (rect.width === 0 || rect.height === 0) return;
-            
-            // Calculate diagonal + generous padding to keep outer buttons comfortably inside circle
-            const diagonal = Math.sqrt(rect.width * rect.width + rect.height * rect.height);
-            const padding = 85; 
-            let diameter = diagonal + padding;
-            
-            // Allow circle to scale up to 580px max
-            const maxAllowed = Math.min(window.innerWidth * 0.82, window.innerHeight * 0.65);
-            diameter = Math.min(diameter, maxAllowed, 580);
-            diameter = Math.max(diameter, 260);
-            
-            wrap.style.width = diameter + 'px';
-            wrap.style.height = diameter + 'px';
-        }
-
-        let ringResizeTimeout = null;
-        function scheduleSizeTimerRing() {
-            clearTimeout(ringResizeTimeout);
-            ringResizeTimeout = setTimeout(sizeTimerRing, 100);
-        }
-
-        function clampUnit(value, min, max) {
-            value = parseInt(value, 10);
-            if (isNaN(value)) value = 0;
-            return Math.min(max, Math.max(min, value));
-        }
-
-        function getUnitValues() {
-            return {
-                hours: clampUnit(hoursInput.value, 0, 99),
-                minutes: clampUnit(minutesInput.value, 0, 59),
-                seconds: clampUnit(secondsInput.value, 0, 59)
-            };
-        }
-
-        function setUnitValues(h, m, s) {
-            hoursInput.value = String(h).padStart(2, '0');
-            minutesInput.value = String(m).padStart(2, '0');
-            secondsInput.value = String(s).padStart(2, '0');
-        }
-
-        function refreshTimerFromInputs() {
-            const u = getUnitValues();
-            setUnitValues(u.hours, u.minutes, u.seconds);
-            state.timerTotal = u.hours * 3600 + u.minutes * 60 + u.seconds;
-            state.timerTime = state.timerTotal;
-            updateRing();
-        }
-
-        function adjustTimerUnit(unit, dir) {
-            if (state.timerRunning) return;
-            const u = getUnitValues();
-            if (unit === 'hours') u.hours = clampUnit(u.hours + dir, 0, 99);
-            if (unit === 'minutes') u.minutes = clampUnit(u.minutes + dir, 0, 59);
-            if (unit === 'seconds') u.seconds = clampUnit(u.seconds + dir, 0, 59);
-            setUnitValues(u.hours, u.minutes, u.seconds);
-            refreshTimerFromInputs();
-        }
-
-        function updateRing() {
-            ringProgress.style.strokeDasharray = `${RING_CIRCUMFERENCE}`;
-            if (!state.timerTotal) {
-                ringProgress.style.opacity = 0;
-                ringProgress.style.strokeDashoffset = `${RING_CIRCUMFERENCE}`;
-                return;
-            }
-            const remainingFraction = Math.max(0, state.timerTime / state.timerTotal);
-            ringProgress.style.opacity = 1;
-            ringProgress.style.strokeDashoffset = `${RING_CIRCUMFERENCE * (1 - remainingFraction)}`;
-        }
-
-        function setTimerControlsDisabled(disabled) {
-            [hoursInput, minutesInput, secondsInput].forEach(el => { el.disabled = disabled; });
-            document.querySelectorAll('.unit-btn').forEach(btn => { btn.disabled = disabled; });
-        }
-
-        function setPlayIcon(playing) {
-            playIcon.innerHTML = playing
-                ? '<rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect>'
-                : '<path d="M8 5v14l11-7z"></path>';
-            timerPlayBtn.setAttribute('aria-label', playing ? 'Pause timer' : 'Start timer');
-        }
-
-        function toggleTimer() {
-            if (state.timerRunning) {
-                pauseTimerNew();
-            } else {
-                startTimerNew();
-            }
-        }
-
-        function startTimerNew() {
-            if (state.timerTime <= 0) {
-                refreshTimerFromInputs();
-            }
-            if (state.timerTime <= 0) return;
-            state.timerRunning = true;
-            setPlayIcon(true);
-            setTimerControlsDisabled(true);
-        }
-
-        function pauseTimerNew() {
-            state.timerRunning = false;
-            setPlayIcon(false);
-            setTimerControlsDisabled(false);
-        }
-
-        function resetTimerNew() {
-            state.timerRunning = false;
-            setPlayIcon(false);
-            setTimerControlsDisabled(false);
-            setUnitValues(0, 5, 0);
-            refreshTimerFromInputs();
-            updateTabTitle('Clock');
-        }
-
-        function tickTimer() {
-            if (state.mode !== 'timer' || !state.timerRunning) return;
-            state.timerTime--;
-            if (state.timerTime <= 0) {
-                state.timerTime = 0;
-                pauseTimerNew();
-                document.title = '✓ Timer Complete';
-            } else {
-                const h = Math.floor(state.timerTime / 3600);
-                const m = Math.floor((state.timerTime % 3600) / 60);
-                const s = state.timerTime % 60;
-                updateTabTitle(`Timer ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`);
-            }
-            const h = Math.floor(state.timerTime / 3600);
-            const m = Math.floor((state.timerTime % 3600) / 60);
-            const s = state.timerTime % 60;
-            setUnitValues(h, m, s);
-            updateRing();
-        }
-
-        function displayStopwatch() {
-            const minutes = Math.floor(state.stopwatchTime / 6000);
-            const seconds = Math.floor((state.stopwatchTime % 6000) / 100);
-            const centiseconds = state.stopwatchTime % 100;
-            const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(centiseconds).padStart(2, '0')}`;
-            timeDisplay.textContent = timeStr;
-            dateDisplay.textContent = '';
-            updateTabTitle(timeStr);
-        }
-
-        function updateTabTitle(title) {
-            document.title = title;
-        }
-
-        function startStopwatch() {
-            if (!state.stopwatchRunning) {
-                state.stopwatchRunning = true;
-                const interval = setInterval(() => {
-                    if (state.stopwatchRunning) {
-                        state.stopwatchTime++;
-                    } else {
-                        clearInterval(interval);
-                    }
-                }, 10);
-            }
-        }
-
-        function pauseStopwatch() {
-            state.stopwatchRunning = false;
-        }
-
-        function resetStopwatch() {
-            state.stopwatchRunning = false;
-            state.stopwatchTime = 0;
-            updateClock();
-        }
-
-        // Start
-        init();
-    </script>
-</body>
-</html>
+                input.addEventListener('focus', () => input
