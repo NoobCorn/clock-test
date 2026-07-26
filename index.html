@@ -145,11 +145,6 @@
             display: flex;
             gap: 15px;
             z-index: 50;
-            transition: opacity 0.3s ease;
-        }
-
-        .mode-controls.dimmed {
-            opacity: 0.25;
         }
 
         .mode-btn {
@@ -376,7 +371,13 @@
             color: white;
         }
 
-        /* Timer Display Optimized */
+        .timer-input {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        /* Timer Display */
         .timer-display {
             display: none;
             width: 100%;
@@ -384,7 +385,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding-bottom: clamp(60px, 8vh, 100px);
+            padding-bottom: clamp(70px, 9vh, 110px);
             z-index: 10;
         }
 
@@ -397,8 +398,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 360px;
-            height: 360px;
+            width: 340px;
+            height: 340px;
         }
 
         .timer-ring {
@@ -438,36 +439,36 @@
         .timer-units {
             display: flex;
             align-items: center;
-            gap: clamp(2px, 0.4vw, 6px);
+            gap: clamp(4px, 0.6vw, 12px);
         }
 
         .timer-unit {
             display: flex;
             align-items: center;
-            gap: clamp(1px, 0.2vw, 4px);
+            gap: clamp(2px, 0.3vw, 6px);
         }
 
         .unit-col {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: clamp(2px, 0.4vw, 6px);
+            gap: clamp(6px, 0.6vw, 10px);
         }
 
         .unit-value {
             font-family: inherit;
-            font-size: clamp(32px, 5vw, 64px);
+            font-size: clamp(36px, 6vw, 76px);
             font-weight: 300;
             color: var(--text-primary);
             background: transparent;
             border: none;
             outline: none;
             text-align: center;
-            width: 2.1ch;
+            width: 2ch;
             font-variant-numeric: tabular-nums;
             line-height: 1;
             padding: 0;
-            letter-spacing: -0.04em;
+            letter-spacing: -0.02em;
             text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
@@ -482,10 +483,10 @@
         }
 
         .unit-label {
-            font-size: clamp(9px, 0.75vw, 12px);
+            font-size: clamp(11px, 0.9vw, 14px);
             color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.1em;
             font-weight: 500;
         }
 
@@ -493,10 +494,10 @@
             background: none;
             border: none;
             color: var(--text-secondary);
-            font-size: clamp(14px, 1.4vw, 20px);
+            font-size: clamp(18px, 1.8vw, 24px);
             cursor: pointer;
-            width: clamp(20px, 1.8vw, 28px);
-            height: clamp(20px, 1.8vw, 28px);
+            width: clamp(28px, 2.2vw, 38px);
+            height: clamp(28px, 2.2vw, 38px);
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -520,13 +521,13 @@
         .timer-colon {
             display: flex;
             flex-direction: column;
-            gap: clamp(4px, 0.4vw, 6px);
-            padding-bottom: clamp(12px, 1.2vw, 18px);
+            gap: clamp(4px, 0.5vw, 8px);
+            padding-bottom: clamp(16px, 1.6vw, 22px);
         }
 
         .timer-colon span {
-            width: clamp(4px, 0.4vw, 6px);
-            height: clamp(4px, 0.4vw, 6px);
+            width: clamp(5px, 0.4vw, 7px);
+            height: clamp(5px, 0.4vw, 7px);
             border-radius: 50%;
             background: var(--text-primary);
             opacity: 0.8;
@@ -536,7 +537,7 @@
             display: flex;
             align-items: center;
             gap: 20px;
-            margin-top: clamp(20px, 4vh, 40px);
+            margin-top: clamp(16px, 3vh, 32px);
             z-index: 10;
         }
 
@@ -554,8 +555,8 @@
         }
 
         .timer-icon-btn.reset {
-            width: 52px;
-            height: 52px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             background: var(--bg-secondary);
             color: var(--text-primary);
@@ -567,8 +568,8 @@
         }
 
         .timer-icon-btn.play {
-            width: 68px;
-            height: 68px;
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
             background: var(--accent);
             color: var(--bg-primary);
@@ -581,6 +582,37 @@
         .timer-icon-btn:disabled {
             opacity: 0.4;
             cursor: not-allowed;
+        }
+
+        .time-input-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .time-input-group label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .time-input-group input {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .time-input-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .button-group {
@@ -695,6 +727,14 @@
         .font-montserrat { font-family: 'Montserrat', sans-serif; }
         .font-raleway { font-family: 'Raleway', sans-serif; }
         .font-lora { font-family: 'Lora', serif; }
+
+        .mode-controls {
+            transition: opacity 0.3s ease;
+        }
+
+        .mode-controls.dimmed {
+            opacity: 0.25;
+        }
     </style>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&family=Space+Mono:wght@400;700&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600&family=Montserrat:wght@400;600&family=Raleway:wght@400;600&family=Lora:wght@400;600&display=swap" rel="stylesheet">
@@ -708,9 +748,9 @@
 
         <div class="timer-display" id="timerDisplay">
             <div class="timer-ring-wrap">
-                <svg class="timer-ring" viewBox="0 0 360 360">
-                    <circle class="ring-bg" cx="180" cy="180" r="165"></circle>
-                    <circle class="ring-progress" id="ringProgress" cx="180" cy="180" r="165"></circle>
+                <svg class="timer-ring" viewBox="0 0 300 300">
+                    <circle class="ring-bg" cx="150" cy="150" r="140"></circle>
+                    <circle class="ring-progress" id="ringProgress" cx="150" cy="150" r="140"></circle>
                 </svg>
                 <div class="timer-units-col">
                     <div class="timer-units">
@@ -1228,6 +1268,7 @@
             updateDateToggle();
             updateGradientToggle();
             updateGradientMovementToggle();
+
             timeFormatSelect.value = state.timeFormat;
             timezoneSelect.value = state.timezone;
         }
@@ -1275,7 +1316,7 @@
             }
         }
 
-        const RING_RADIUS = 165;
+        const RING_RADIUS = 140;
         const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
         function sizeTimerRing() {
@@ -1284,12 +1325,17 @@
             if (!col || !wrap) return;
             const rect = col.getBoundingClientRect();
             if (rect.width === 0 || rect.height === 0) return;
+            
+            // Calculate diagonal + generous padding to keep outer buttons comfortably inside circle
             const diagonal = Math.sqrt(rect.width * rect.width + rect.height * rect.height);
-            const padding = 65;
+            const padding = 85; 
             let diameter = diagonal + padding;
-            const maxAllowed = Math.min(window.innerWidth * 0.75, window.innerHeight * 0.58);
-            diameter = Math.min(diameter, maxAllowed, 480);
+            
+            // Allow circle to scale up to 580px max
+            const maxAllowed = Math.min(window.innerWidth * 0.82, window.innerHeight * 0.65);
+            diameter = Math.min(diameter, maxAllowed, 580);
             diameter = Math.max(diameter, 260);
+            
             wrap.style.width = diameter + 'px';
             wrap.style.height = diameter + 'px';
         }
