@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clock</title>
+    <title>Clock & To-Do</title>
     <style>
         * {
             margin: 0;
@@ -108,12 +108,19 @@
             opacity: 1;
         }
 
+        .controls .left-controls,
         .controls .settings-btn {
             pointer-events: none;
         }
 
+        .controls.visible .left-controls,
         .controls.visible .settings-btn {
             pointer-events: auto;
+        }
+
+        .left-controls {
+            display: flex;
+            gap: 10px;
         }
 
         .settings-btn {
@@ -137,6 +144,33 @@
             transform: scale(1.05);
         }
 
+        .tasks-btn {
+            height: 50px;
+            padding: 0 18px 0 14px;
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+        }
+
+        .tasks-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        .tasks-btn svg {
+            flex-shrink: 0;
+        }
+
         .mode-controls {
             position: fixed;
             bottom: 3vmin;
@@ -145,6 +179,11 @@
             display: flex;
             gap: 15px;
             z-index: 50;
+            transition: opacity 0.3s ease;
+        }
+
+        .mode-controls.dimmed {
+            opacity: 0.25;
         }
 
         .mode-btn {
@@ -177,9 +216,12 @@
             width: 100%;
             max-width: 400px;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 14, 0.55);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             border-left: 1px solid rgba(255, 255, 255, 0.1);
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
             transform: translateX(100%);
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 100;
@@ -371,12 +413,6 @@
             color: white;
         }
 
-        .timer-input {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
         /* Timer Display */
         .timer-display {
             display: none;
@@ -385,7 +421,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding-bottom: clamp(70px, 9vh, 110px);
+            gap: clamp(8px, 1.5vh, 16px);
             z-index: 10;
         }
 
@@ -424,7 +460,7 @@
             stroke: var(--accent);
             stroke-width: 3;
             stroke-linecap: round;
-            transition: stroke-dashoffset 0.3s linear, opacity 0.3s ease;
+            transition: opacity 0.3s ease;
         }
 
         .timer-units-col {
@@ -434,25 +470,26 @@
             flex-direction: column;
             align-items: center;
             width: max-content;
+            transition: transform 0.2s ease;
         }
 
         .timer-units {
             display: flex;
             align-items: center;
-            gap: clamp(6px, 0.8vw, 14px);
+            gap: clamp(2px, 0.4vw, 8px);
         }
 
         .timer-unit {
             display: flex;
             align-items: center;
-            gap: clamp(2px, 0.3vw, 6px);
+            gap: clamp(1px, 0.2vw, 4px);
         }
 
         .unit-col {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: clamp(6px, 0.6vw, 10px);
+            gap: clamp(4px, 0.4vw, 8px);
         }
 
         .unit-value {
@@ -496,8 +533,8 @@
             color: var(--text-secondary);
             font-size: clamp(18px, 1.8vw, 24px);
             cursor: pointer;
-            width: clamp(30px, 2.4vw, 40px);
-            height: clamp(30px, 2.4vw, 40px);
+            width: clamp(26px, 2vw, 34px);
+            height: clamp(26px, 2vw, 34px);
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -521,8 +558,8 @@
         .timer-colon {
             display: flex;
             flex-direction: column;
-            gap: clamp(4px, 0.5vw, 8px);
-            padding-bottom: clamp(16px, 1.6vw, 22px);
+            gap: clamp(3px, 0.4vw, 6px);
+            padding-bottom: clamp(12px, 1.2vw, 18px);
         }
 
         .timer-colon span {
@@ -537,7 +574,6 @@
             display: flex;
             align-items: center;
             gap: 20px;
-            margin-top: clamp(16px, 3vh, 32px);
             z-index: 10;
         }
 
@@ -579,142 +615,332 @@
             filter: brightness(1.08);
         }
 
-        .timer-icon-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .time-input-group {
-            flex: 1;
+        /* ===== To-Do Panel ===== */
+        .todo-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            max-width: 380px;
+            height: 100vh;
+            background: rgba(10, 10, 14, 0.55);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-        .time-input-group label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+        .todo-panel.open {
+            transform: translateX(0);
         }
 
-        .time-input-group input {
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-            font-family: 'Roboto Mono', monospace;
-            font-size: 16px;
-            text-align: center;
-        }
-
-        .time-input-group input:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .button-group {
+        .todo-header {
             display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 28px 24px 20px;
+            flex-shrink: 0;
         }
 
-        .btn {
-            flex: 1;
-            padding: 12px 16px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-            font-size: 14px;
-            font-family: inherit;
+        .todo-header h2 {
+            font-size: 22px;
+            color: #ffffff;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .todo-close-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 20px;
             cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .btn.primary {
-            background: var(--accent);
-            color: var(--bg-primary);
-            border-color: var(--accent);
-        }
-
-        .btn.primary:hover {
-            opacity: 0.9;
-        }
-
-        .gradient-options {
             display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
         }
 
-        .gradient-option {
+        .todo-close-btn:hover {
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        .todo-body {
             flex: 1;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-primary);
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
+            overflow-y: auto;
+            padding: 0 24px;
         }
 
-        .gradient-option.active {
-            background: var(--accent);
-            color: var(--bg-primary);
-            border-color: var(--accent);
+        .todo-body::-webkit-scrollbar {
+            width: 6px;
         }
 
-        .mode-content {
+        .todo-body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
+        }
+
+        .todo-section {
+            margin-bottom: 22px;
+        }
+
+        .todo-section:empty {
             display: none;
         }
 
-        .mode-content.active {
-            display: block;
+        .todo-section-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.45);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+            margin-bottom: 10px;
         }
+
+        .todo-section-label.overdue-label {
+            color: #fb7185;
+        }
+
+        /* Task Card & Drag Styling */
+        .task-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 14px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 8px;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+            user-select: none;
+        }
+
+        .task-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .task-card.dragging {
+            opacity: 0.35;
+            border: 1px dashed rgba(255, 255, 255, 0.4);
+            transform: scale(0.98);
+        }
+
+        .task-card.drag-over {
+            border-top: 2px solid #6366f1;
+        }
+
+        .task-checkbox {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            background: transparent;
+            flex-shrink: 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            padding: 0;
+        }
+
+        .task-checkbox svg {
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        .task-checkbox.checked {
+            background: #6366f1;
+            border-color: #6366f1;
+        }
+
+        .task-checkbox.checked svg {
+            opacity: 1;
+        }
+
+        .task-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-name {
+            font-size: 14.5px;
+            color: #ffffff;
+            font-weight: 500;
+            line-height: 1.3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .task-card.completed .task-name {
+            color: rgba(255, 255, 255, 0.4);
+            text-decoration: line-through;
+        }
+
+        .task-due {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 2px;
+        }
+
+        .task-due.tier-red { color: #fb7185; }
+        .task-due.tier-orange { color: #fbbf24; }
+        .task-due.tier-green { color: #34d399; }
+
+        .task-card.completed .task-due {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Hamburger Handle */
+        .task-drag-handle {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: grab;
+            transition: color 0.15s ease;
+        }
+
+        .task-drag-handle:hover {
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .task-drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .task-delete-btn {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            border: none;
+            background: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: color 0.15s ease;
+        }
+
+        .task-delete-btn:hover {
+            color: #fb7185;
+        }
+
+        .todo-footer {
+            flex-shrink: 0;
+            padding: 18px 24px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .todo-progress-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
+
+        .todo-progress-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .todo-progress-pct {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.75);
+            font-weight: 600;
+        }
+
+        .todo-progress-track {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .todo-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #818cf8, #6366f1);
+            transition: width 0.3s ease;
+        }
+
+        .add-task-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .add-task-input {
+            flex: 1;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .add-task-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .add-task-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .add-task-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: #6366f1;
+            color: #ffffff;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: filter 0.15s ease, transform 0.1s ease;
+        }
+
+        .add-task-btn:hover { filter: brightness(1.1); }
+        .add-task-btn:active { transform: scale(0.94); }
 
         @media (max-width: 768px) {
-            .settings-panel {
+            .settings-panel, .todo-panel {
                 max-width: 100%;
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
             }
-
-            .time {
-                font-size: 18vw;
-            }
-
-            .date {
-                font-size: 4vw;
-            }
-
-            .settings-group {
-                grid-template-columns: 1fr;
-            }
-
-            .mode-btn {
-                padding: 8px 16px;
-                font-size: 12px;
-            }
+            .time { font-size: 18vw; }
+            .date { font-size: 4vw; }
+            .mode-btn { padding: 8px 16px; font-size: 12px; }
+            .tasks-btn span { display: none; }
+            .tasks-btn { width: 50px; padding: 0; justify-content: center; }
         }
-
-        /* Themes */
-        .theme-midnight { background: linear-gradient(135deg, #0f0f1e 0%, #1a1a3e 100%); color: #ffffff; }
-        .theme-ocean { background: linear-gradient(135deg, #001a33 0%, #004466 100%); color: #ffffff; }
-        .theme-aurora { background: linear-gradient(135deg, #0a3a52 0%, #16e0bd 100%); color: #ffffff; }
-        .theme-sunset { background: linear-gradient(135deg, #ff6b35 0%, #ffa500 100%); color: #000000; }
-        .theme-purple-space { background: linear-gradient(135deg, #2d1b69 0%, #8f39fc 100%); color: #ffffff; }
-        .theme-snow { background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%); color: #000000; }
-        .theme-forest { background: linear-gradient(135deg, #1b4332 0%, #52b788 100%); color: #ffffff; }
-        .theme-ember { background: linear-gradient(135deg, #6a040f 0%, #ff006e 100%); color: #ffffff; }
-        .theme-gold { background: linear-gradient(135deg, #8b7500 0%, #ffd700 100%); color: #000000; }
-        .theme-monochrome { background: linear-gradient(135deg, #000000 0%, #ffffff 100%); color: #ffffff; }
 
         /* Font Styles */
         .font-inter { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
@@ -727,19 +953,10 @@
         .font-montserrat { font-family: 'Montserrat', sans-serif; }
         .font-raleway { font-family: 'Raleway', sans-serif; }
         .font-lora { font-family: 'Lora', serif; }
-
-        .mode-controls {
-            transition: opacity 0.3s ease;
-        }
-
-        .mode-controls.dimmed {
-            opacity: 0.25;
-        }
     </style>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&family=Space+Mono:wght@400;700&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600&family=Montserrat:wght@400;600&family=Raleway:wght@400;600&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;700&family=Roboto+Mono:wght@400;700&family=Space+Mono:wght@400;700&family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600&family=Montserrat:wght@400;600&family=Raleway:wght@400;600&family=Lora:wght@400;600&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="font-inter">
     <div class="container">
         <div class="clock-display" id="clockDisplay">
             <p class="time" id="time">00:00:00</p>
@@ -792,659 +1009,460 @@
                 </button>
             </div>
         </div>
-    </div>
 
-    <div class="controls" id="controls">
-        <button class="settings-btn" id="settingsBtn">⚙️</button>
-        <div></div>
-    </div>
-
-    <div class="mode-controls" id="modeControls">
-        <button class="mode-btn active" data-mode="clock">Clock</button>
-        <button class="mode-btn" data-mode="timer">Timer</button>
-    </div>
-
-    <div class="settings-panel" id="settingsPanel">
-        <div class="settings-header">
-            <h2>Settings</h2>
-            <button class="close-btn" id="closeSettings">&times;</button>
-        </div>
-
-        <div class="settings-section">
-            <h3>Theme</h3>
-            <div class="settings-group" id="themeGroup">
-                </div>
-        </div>
-
-        <div class="settings-section">
-            <h3>Gradient</h3>
-            <div class="toggle-group">
-                <button class="toggle" id="gradientToggle"></button>
-                <label class="toggle-label">Enable Gradient</label>
+        <div class="controls" id="controls">
+            <div class="left-controls">
+                <button class="tasks-btn" id="todoToggleBtn" title="To-Do List">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 11l3 3L22 4"></path>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                    </svg>
+                    <span>Tasks</span>
+                </button>
             </div>
-            <div id="gradientOptions" style="display: none;">
+            <button class="settings-btn" id="settingsBtn" title="Settings">&#9881;</button>
+        </div>
+
+        <div class="mode-controls" id="modeControls">
+            <button class="mode-btn active" data-mode="clock">Clock</button>
+            <button class="mode-btn" data-mode="timer">Timer</button>
+        </div>
+
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-header">
+                <h2>Settings</h2>
+                <button class="close-btn" id="closeBtn">&times;</button>
+            </div>
+            <div class="settings-section">
+                <h3>Font</h3>
+                <div class="select-group">
+                    <select id="fontSelect">
+                        <option value="font-inter">Inter</option>
+                        <option value="font-helvetica">Helvetica</option>
+                        <option value="font-orbitron">Orbitron</option>
+                        <option value="font-roboto-mono">Roboto Mono</option>
+                        <option value="font-space-mono">Space Mono</option>
+                        <option value="font-playfair">Playfair Display</option>
+                        <option value="font-poppins">Poppins</option>
+                        <option value="font-montserrat">Montserrat</option>
+                        <option value="font-raleway">Raleway</option>
+                        <option value="font-lora">Lora</option>
+                    </select>
+                </div>
+            </div>
+            <div class="settings-section">
+                <h3>Time Format</h3>
                 <div class="toggle-group">
-                    <button class="toggle" id="gradientMovementToggle"></button>
-                    <label class="toggle-label">Animate Gradient</label>
+                    <button class="toggle on" id="formatToggle"></button>
+                    <span class="toggle-label" id="formatLabel">24-Hour</span>
                 </div>
-                <label class="settings-label" style="display: block; color: var(--text-primary); font-size: 12px; margin-bottom: 8px;">Style</label>
-                <div class="gradient-options">
-                    <button class="gradient-option active" data-gradient="linear">Linear</button>
-                    <button class="gradient-option" data-gradient="diagonal">Diagonal</button>
-                    <button class="gradient-option" data-gradient="radial">Radial</button>
+                <div class="toggle-group">
+                    <button class="toggle on" id="secondsToggle"></button>
+                    <span class="toggle-label">Show Seconds</span>
                 </div>
             </div>
         </div>
 
-        <div class="settings-section">
-            <h3>Font</h3>
-            <div class="settings-group" id="fontGroup">
+        <div class="todo-panel" id="todoPanel">
+            <div class="todo-header">
+                <h2>Tasks</h2>
+                <button class="todo-close-btn" id="todoCloseBtn">&times;</button>
+            </div>
+            <div class="todo-body">
+                <div class="todo-section" id="todoMainSection"></div>
+            </div>
+            <div class="todo-footer">
+                <div class="todo-progress-row">
+                    <span class="todo-progress-text" id="todoProgressText">0 of 0 tasks completed</span>
+                    <span class="todo-progress-pct" id="todoProgressPct">0%</span>
                 </div>
-        </div>
-
-        <div class="settings-section">
-            <h3>Time</h3>
-            <div class="toggle-group">
-                <button class="toggle" id="secondsToggle"></button>
-                <label class="toggle-label">Show Seconds</label>
-            </div>
-            <div class="toggle-group">
-                <button class="toggle" id="dateToggle"></button>
-                <label class="toggle-label">Show Date</label>
-            </div>
-            <div class="select-group">
-                <label class="select-label">Format</label>
-                <select id="timeFormatSelect">
-                    <option value="12">12 Hour</option>
-                    <option value="24">24 Hour</option>
-                </select>
-            </div>
-            <div class="select-group">
-                <label class="select-label">Timezone</label>
-                <select id="timezoneSelect">
-                    <option value="local">Local</option>
-                    <option value="America/New_York">New York</option>
-                    <option value="Europe/London">London</option>
-                    <option value="Europe/Paris">Paris</option>
-                    <option value="Asia/Tokyo">Tokyo</option>
-                    <option value="Asia/Shanghai">Shanghai</option>
-                    <option value="Australia/Sydney">Sydney</option>
-                    <option value="Asia/Dubai">Dubai</option>
-                </select>
+                <div class="todo-progress-track">
+                    <div class="todo-progress-fill" id="todoProgressFill" style="width: 0%;"></div>
+                </div>
+                <div class="add-task-row" id="addTaskRow">
+                    <input type="text" class="add-task-input" id="newTaskInput" placeholder="Add a task..." maxlength="120">
+                    <button class="add-task-btn" id="addTaskBtn" title="Add task">+</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        const THEMES = [
-            { name: 'Midnight', class: 'theme-midnight', textColor: '#ffffff', textSecondary: 'rgba(255,255,255,0.7)', gradient1: '#0f0f1e', gradient2: '#1a1a3e' },
-            { name: 'Ocean', class: 'theme-ocean', textColor: '#ffffff', textSecondary: 'rgba(255,255,255,0.7)', gradient1: '#001a33', gradient2: '#004466' },
-            { name: 'Aurora', class: 'theme-aurora', textColor: '#ffffff', textSecondary: 'rgba(255,255,255,0.7)', gradient1: '#0a3a52', gradient2: '#16e0bd' },
-            { name: 'Sunset', class: 'theme-sunset', textColor: '#000000', textSecondary: 'rgba(0,0,0,0.6)', gradient1: '#ff6b35', gradient2: '#ffa500' },
-            { name: 'Purple Space', class: 'theme-purple-space', textColor: '#ffffff', textSecondary: 'rgba(255,255,255,0.7)', gradient1: '#2d1b69', gradient2: '#8f39fc' },
-            { name: 'Snow', class: 'theme-snow', textColor: '#000000', textSecondary: 'rgba(0,0,0,0.6)', gradient1: '#f5f5f5', gradient2: '#ffffff' },
-            { name: 'Forest', class: 'theme-forest', textColor: '#ffffff', textSecondary: 'rgba(255,255,255,0.7)', gradient1: '#1b4332', gradient2: '#52b788' },
-            { name: 'Ember', class: 'theme-ember', textColor: '#ffffff', textSecondary: 'rgba(255,255,255,0.7)', gradient1: '#6a040f', gradient2: '#ff006e' },
-            { name: 'Gold', class: 'theme-gold', textColor: '#000000', textSecondary: 'rgba(0,0,0,0.6)', gradient1: '#8b7500', gradient2: '#ffd700' },
-            { name: 'Monochrome', class: 'theme-monochrome', textColor: '#ffffff', textSecondary: 'rgba(255,255,255,0.7)', gradient1: '#000000', gradient2: '#ffffff' }
-        ];
-
-        const FONTS = [
-            { name: 'Inter', class: 'font-inter' },
-            { name: 'Helvetica', class: 'font-helvetica' },
-            { name: 'Orbitron', class: 'font-orbitron' },
-            { name: 'Roboto Mono', class: 'font-roboto-mono' },
-            { name: 'Space Mono', class: 'font-space-mono' },
-            { name: 'Playfair', class: 'font-playfair' },
-            { name: 'Poppins', class: 'font-poppins' },
-            { name: 'Montserrat', class: 'font-montserrat' },
-            { name: 'Raleway', class: 'font-raleway' },
-            { name: 'Lora', class: 'font-lora' }
-        ];
-
         // State
-        const state = {
-            mode: 'clock',
-            theme: 'Midnight',
-            font: 'Inter',
-            showSeconds: true,
-            showDate: true,
-            timeFormat: '12',
-            timezone: 'local',
-            gradientOn: false,
-            gradientMovement: false,
-            gradientStyle: 'linear',
-            timerRunning: false,
-            timerTime: 0,
-            timerTotal: 0,
-            controlsVisible: false,
-            inactivityTimer: null
-        };
+        let currentMode = 'clock';
+        let is24Hour = true;
+        let showSeconds = true;
+        let tasks = [];
+        let nextTaskId = 1;
+        let draggedTaskId = null;
 
-        // DOM Elements
-        const timeDisplay = document.getElementById('time');
-        const dateDisplay = document.getElementById('date');
-        const settingsBtn = document.getElementById('settingsBtn');
-        const settingsPanel = document.getElementById('settingsPanel');
-        const closeSettings = document.getElementById('closeSettings');
+        // Clock State
+        let clockInterval;
+
+        // Timer State
+        let timerDuration = 300;
+        let timerRemaining = 300;
+        let timerRunning = false;
+        let timerInterval = null;
+
+        // DOM elements
+        const body = bodyElement = document.body;
+        const clockDisplay = document.getElementById('clockDisplay');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const timeElement = document.getElementById('time');
+        const dateElement = document.getElementById('date');
         const controls = document.getElementById('controls');
         const modeControls = document.getElementById('modeControls');
-        const gradientToggle = document.getElementById('gradientToggle');
-        const gradientOptions = document.getElementById('gradientOptions');
-        const gradientMovementToggle = document.getElementById('gradientMovementToggle');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const closeBtn = document.getElementById('closeBtn');
+        const fontSelect = document.getElementById('fontSelect');
+        const formatToggle = document.getElementById('formatToggle');
+        const formatLabel = document.getElementById('formatLabel');
         const secondsToggle = document.getElementById('secondsToggle');
-        const dateToggle = document.getElementById('dateToggle');
-        const timeFormatSelect = document.getElementById('timeFormatSelect');
-        const timezoneSelect = document.getElementById('timezoneSelect');
-        const clockDisplayEl = document.getElementById('clockDisplay');
-        const timerDisplayEl = document.getElementById('timerDisplay');
+
+        // To-Do DOM
+        const todoPanel = document.getElementById('todoPanel');
+        const todoToggleBtn = document.getElementById('todoToggleBtn');
+        const todoCloseBtn = document.getElementById('todoCloseBtn');
+        const todoMainSection = document.getElementById('todoMainSection');
+        const todoProgressText = document.getElementById('todoProgressText');
+        const todoProgressPct = document.getElementById('todoProgressPct');
+        const todoProgressFill = document.getElementById('todoProgressFill');
+        const newTaskInput = document.getElementById('newTaskInput');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+
+        // Timer DOM
         const hoursInput = document.getElementById('hoursInput');
         const minutesInput = document.getElementById('minutesInput');
         const secondsInput = document.getElementById('secondsInput');
-        const ringProgress = document.getElementById('ringProgress');
         const timerPlayBtn = document.getElementById('timerPlayBtn');
-        const timerResetBtnNew = document.getElementById('timerResetBtnNew');
+        const timerResetBtn = document.getElementById('timerResetBtnNew');
         const playIcon = document.getElementById('playIcon');
+        const ringProgress = document.getElementById('ringProgress');
 
-        // Initialize
+        const RADIUS = 140;
+        const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
         function init() {
+            if (ringProgress) {
+                ringProgress.style.strokeDasharray = `${CIRCUMFERENCE} ${CIRCUMFERENCE}`;
+                ringProgress.style.strokeDashoffset = '0';
+            }
+
             loadSettings();
-            renderThemes();
-            renderFonts();
+            loadTasks();
             setupEventListeners();
+            startClock();
+            updateTimerDisplay();
+        }
+
+        // Clock functions
+        function startClock() {
             updateClock();
-            setInterval(updateClock, 100);
-            setInterval(tickTimer, 1000);
-            applySettings();
-            refreshTimerFromInputs();
-            selectMode(state.mode);
-
-            requestAnimationFrame(sizeTimerRing);
-            window.addEventListener('resize', scheduleSizeTimerRing);
-            if (document.fonts && document.fonts.ready) {
-                document.fonts.ready.then(sizeTimerRing).catch(() => {});
-            }
-        }
-
-        function loadSettings() {
-            try {
-                const saved = localStorage.getItem('clockSettings');
-                if (saved) {
-                    const settings = JSON.parse(saved);
-                    Object.assign(state, settings);
-                }
-            } catch (e) {
-                // localStorage unavailable (private browsing, sandboxed preview, file:// origin, etc.)
-            }
-        }
-
-        function saveSettings() {
-            try {
-                const toSave = {
-                    theme: state.theme,
-                    font: state.font,
-                    showSeconds: state.showSeconds,
-                    showDate: state.showDate,
-                    timeFormat: state.timeFormat,
-                    timezone: state.timezone,
-                    gradientOn: state.gradientOn,
-                    gradientMovement: state.gradientMovement,
-                    gradientStyle: state.gradientStyle,
-                    mode: state.mode
-                };
-                localStorage.setItem('clockSettings', JSON.stringify(toSave));
-            } catch (e) {
-                // localStorage unavailable - settings just won't persist across reloads
-            }
-        }
-
-        function renderThemes() {
-            const group = document.getElementById('themeGroup');
-            group.innerHTML = THEMES.map(theme => 
-                `<div class="theme-preview ${theme.class} ${state.theme === theme.name ? 'active' : ''}" 
-                     data-theme="${theme.name}" 
-                     title="${theme.name}">Aa</div>`
-            ).join('');
-            
-            group.querySelectorAll('.theme-preview').forEach(el => {
-                el.addEventListener('click', () => selectTheme(el.dataset.theme));
-            });
-        }
-
-        function renderFonts() {
-            const group = document.getElementById('fontGroup');
-            group.innerHTML = FONTS.map(font => 
-                `<div class="font-preview ${font.class} ${state.font === font.name ? 'active' : ''}" 
-                     data-font="${font.name}">
-                    ${font.name}
-                </div>`
-            ).join('');
-            
-            group.querySelectorAll('.font-preview').forEach(el => {
-                el.addEventListener('click', () => selectFont(el.dataset.font));
-            });
-        }
-
-        function selectTheme(themeName) {
-            state.theme = themeName;
-            const theme = THEMES.find(t => t.name === themeName);
-            
-            document.documentElement.style.setProperty('--bg-primary', theme.gradient1);
-            document.documentElement.style.setProperty('--text-primary', theme.textColor);
-            document.documentElement.style.setProperty('--text-secondary', theme.textSecondary);
-            document.documentElement.style.setProperty('--accent', theme.textColor);
-            document.documentElement.style.setProperty('--gradient-1', theme.gradient1);
-            document.documentElement.style.setProperty('--gradient-2', theme.gradient2);
-            
-            document.querySelectorAll('.theme-preview').forEach(el => {
-                el.classList.toggle('active', el.dataset.theme === themeName);
-            });
-            
-            applyThemeBackground();
-            saveSettings();
-        }
-
-        function selectFont(fontName) {
-            state.font = fontName;
-            const font = FONTS.find(f => f.name === fontName);
-            document.body.classList.remove(...Array.from(document.body.classList).filter(c => c.startsWith('font-')));
-            document.body.classList.add(font.class);
-            
-            document.querySelectorAll('.font-preview').forEach(el => {
-                el.classList.toggle('active', el.dataset.font === fontName);
-            });
-            
-            saveSettings();
-        }
-
-        function applyThemeBackground() {
-            const body = document.body;
-            body.classList.remove('gradient-on', 'gradient-diagonal', 'gradient-radial', 'gradient-movement-off');
-            
-            if (state.gradientOn) {
-                body.classList.add('gradient-on', `gradient-${state.gradientStyle}`);
-                if (!state.gradientMovement) {
-                    body.classList.add('gradient-movement-off');
-                }
-            }
-        }
-
-        function setupEventListeners() {
-            // Settings
-            settingsBtn.addEventListener('click', () => {
-                settingsPanel.classList.add('open');
-                showControls();
-            });
-
-            closeSettings.addEventListener('click', () => {
-                settingsPanel.classList.remove('open');
-            });
-
-            // Gradient
-            gradientToggle.addEventListener('click', () => {
-                state.gradientOn = !state.gradientOn;
-                updateGradientToggle();
-                applyThemeBackground();
-                saveSettings();
-            });
-
-            gradientMovementToggle.addEventListener('click', () => {
-                state.gradientMovement = !state.gradientMovement;
-                updateGradientMovementToggle();
-                applyThemeBackground();
-                saveSettings();
-            });
-
-            document.querySelectorAll('.gradient-option').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.gradient-option').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    state.gradientStyle = btn.dataset.gradient;
-                    applyThemeBackground();
-                    saveSettings();
-                });
-            });
-
-            // Time settings
-            secondsToggle.addEventListener('click', () => {
-                state.showSeconds = !state.showSeconds;
-                updateSecondsToggle();
-                saveSettings();
-            });
-
-            dateToggle.addEventListener('click', () => {
-                state.showDate = !state.showDate;
-                updateDateToggle();
-                saveSettings();
-            });
-
-            timeFormatSelect.addEventListener('change', (e) => {
-                state.timeFormat = e.target.value;
-                saveSettings();
-            });
-
-            timezoneSelect.addEventListener('change', (e) => {
-                state.timezone = e.target.value;
-                saveSettings();
-            });
-
-            // Mode controls
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    selectMode(btn.dataset.mode);
-                    showControls();
-                });
-            });
-
-            // Timer
-            timerPlayBtn.addEventListener('click', toggleTimer);
-            timerResetBtnNew.addEventListener('click', resetTimerNew);
-
-            document.querySelectorAll('.unit-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    adjustTimerUnit(btn.dataset.unit, parseInt(btn.dataset.dir, 10));
-                });
-            });
-
-            [hoursInput, minutesInput, secondsInput].forEach(input => {
-                input.addEventListener('focus', () => input.select());
-
-                input.addEventListener('input', () => {
-                    input.value = input.value.replace(/\D/g, '').slice(0, 2);
-                });
-
-                input.addEventListener('change', () => {
-                    refreshTimerFromInputs();
-                });
-
-                input.addEventListener('blur', () => {
-                    refreshTimerFromInputs();
-                });
-
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') input.blur();
-                });
-            });
-
-            // Mouse activity
-            document.addEventListener('mousemove', showControls);
-            document.addEventListener('click', (e) => {
-                if (!settingsPanel.contains(e.target) && !settingsBtn.contains(e.target)) {
-                    // Clicked outside settings
-                }
-            });
-        }
-
-        function selectMode(mode) {
-            state.mode = mode;
-            
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.mode === mode);
-            });
-
-            document.querySelectorAll('.mode-content').forEach(el => {
-                el.classList.remove('active');
-            });
-
-            clockDisplayEl.style.display = mode === 'timer' ? 'none' : '';
-            timerDisplayEl.classList.toggle('active', mode === 'timer');
-
-            if (mode === 'timer') {
-                requestAnimationFrame(sizeTimerRing);
-            }
-
-            saveSettings();
-        }
-
-        function showControls() {
-            controls.classList.add('visible');
-            modeControls.classList.remove('dimmed');
-            clearTimeout(state.inactivityTimer);
-
-            state.inactivityTimer = setTimeout(() => {
-                controls.classList.remove('visible');
-                modeControls.classList.add('dimmed');
-            }, 5000);
-        }
-
-        function updateGradientToggle() {
-            if (state.gradientOn) {
-                gradientToggle.classList.add('on');
-                gradientOptions.style.display = 'block';
-            } else {
-                gradientToggle.classList.remove('on');
-                gradientOptions.style.display = 'none';
-            }
-        }
-
-        function updateGradientMovementToggle() {
-            if (state.gradientMovement) {
-                gradientMovementToggle.classList.add('on');
-            } else {
-                gradientMovementToggle.classList.remove('on');
-            }
-        }
-
-        function updateSecondsToggle() {
-            if (state.showSeconds) {
-                secondsToggle.classList.add('on');
-            } else {
-                secondsToggle.classList.remove('on');
-            }
-        }
-
-        function updateDateToggle() {
-            if (state.showDate) {
-                dateToggle.classList.add('on');
-            } else {
-                dateToggle.classList.remove('on');
-            }
-        }
-
-        function applySettings() {
-            // Apply theme
-            selectTheme(state.theme);
-
-            // Apply font
-            selectFont(state.font);
-
-            // Apply background
-            applyThemeBackground();
-
-            // Apply toggles
-            updateSecondsToggle();
-            updateDateToggle();
-            updateGradientToggle();
-            updateGradientMovementToggle();
-
-            // Apply selects
-            timeFormatSelect.value = state.timeFormat;
-            timezoneSelect.value = state.timezone;
+            clockInterval = setInterval(updateClock, 1000);
         }
 
         function updateClock() {
-            if (state.mode === 'clock') {
-                displayClock();
-            }
-        }
-
-        function displayClock() {
-            let now;
-            if (state.timezone === 'local') {
-                now = new Date();
-            } else {
-                now = new Date(new Date().toLocaleString('en-US', { timeZone: state.timezone }));
-            }
-
+            const now = new Date();
             let hours = now.getHours();
-            let minutes = now.getMinutes();
-            let seconds = now.getSeconds();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
 
-            let timeStr;
-            if (state.timeFormat === '12') {
-                const ampm = hours >= 12 ? 'PM' : 'AM';
+            if (!is24Hour) {
                 hours = hours % 12 || 12;
-                timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-                if (state.showSeconds) timeStr += `:${String(seconds).padStart(2, '0')}`;
-                timeStr += ` ${ampm}`;
+            }
+            hours = String(hours).padStart(2, '0');
+
+            timeElement.textContent = showSeconds ? `${hours}:${minutes}:${seconds}` : `${hours}:${minutes}`;
+
+            const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+            dateElement.textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Timer functions
+        function updateTimerDisplay() {
+            const h = Math.floor(timerRemaining / 3600);
+            const m = Math.floor((timerRemaining % 3600) / 60);
+            const s = timerRemaining % 60;
+
+            if (!timerRunning) {
+                hoursInput.value = String(h).padStart(2, '0');
+                minutesInput.value = String(m).padStart(2, '0');
+                secondsInput.value = String(s).padStart(2, '0');
             } else {
-                timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-                if (state.showSeconds) timeStr += `:${String(seconds).padStart(2, '0')}`;
+                hoursInput.value = String(h).padStart(2, '0');
+                minutesInput.value = String(m).padStart(2, '0');
+                secondsInput.value = String(s).padStart(2, '0');
             }
 
-            timeDisplay.textContent = timeStr;
-            updateTabTitle(timeStr);
-
-            if (state.showDate) {
-                const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-                dateDisplay.textContent = dateStr;
-            } else {
-                dateDisplay.textContent = '';
+            if (ringProgress && timerDuration > 0) {
+                const fraction = timerRemaining / timerDuration;
+                const offset = CIRCUMFERENCE - fraction * CIRCUMFERENCE;
+                ringProgress.style.strokeDashoffset = offset;
             }
-        }
-
-        const RING_RADIUS = 140;
-        const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
-
-        function sizeTimerRing() {
-            const col = document.querySelector('.timer-units-col');
-            const wrap = document.querySelector('.timer-ring-wrap');
-            if (!col || !wrap) return;
-            const rect = col.getBoundingClientRect();
-            if (rect.width === 0 || rect.height === 0) return;
-            const diagonal = Math.sqrt(rect.width * rect.width + rect.height * rect.height);
-            const padding = 55;
-            let diameter = diagonal + padding;
-            const maxAllowed = Math.min(window.innerWidth * 0.75, window.innerHeight * 0.62);
-            diameter = Math.min(diameter, maxAllowed, 440);
-            diameter = Math.max(diameter, 220);
-            wrap.style.width = diameter + 'px';
-            wrap.style.height = diameter + 'px';
-        }
-
-        let ringResizeTimeout = null;
-        function scheduleSizeTimerRing() {
-            clearTimeout(ringResizeTimeout);
-            ringResizeTimeout = setTimeout(sizeTimerRing, 100);
-        }
-
-        function clampUnit(value, min, max) {
-            value = parseInt(value, 10);
-            if (isNaN(value)) value = 0;
-            return Math.min(max, Math.max(min, value));
-        }
-
-        function getUnitValues() {
-            return {
-                hours: clampUnit(hoursInput.value, 0, 99),
-                minutes: clampUnit(minutesInput.value, 0, 59),
-                seconds: clampUnit(secondsInput.value, 0, 59)
-            };
-        }
-
-        function setUnitValues(h, m, s) {
-            hoursInput.value = String(h).padStart(2, '0');
-            minutesInput.value = String(m).padStart(2, '0');
-            secondsInput.value = String(s).padStart(2, '0');
-        }
-
-        function refreshTimerFromInputs() {
-            const u = getUnitValues();
-            setUnitValues(u.hours, u.minutes, u.seconds);
-            state.timerTotal = u.hours * 3600 + u.minutes * 60 + u.seconds;
-            state.timerTime = state.timerTotal;
-            updateRing();
-        }
-
-        function adjustTimerUnit(unit, dir) {
-            if (state.timerRunning) return;
-            const u = getUnitValues();
-            if (unit === 'hours') u.hours = clampUnit(u.hours + dir, 0, 99);
-            if (unit === 'minutes') u.minutes = clampUnit(u.minutes + dir, 0, 59);
-            if (unit === 'seconds') u.seconds = clampUnit(u.seconds + dir, 0, 59);
-            setUnitValues(u.hours, u.minutes, u.seconds);
-            refreshTimerFromInputs();
-        }
-
-        function updateRing() {
-            ringProgress.style.strokeDasharray = `${RING_CIRCUMFERENCE}`;
-            if (!state.timerTotal) {
-                ringProgress.style.opacity = 0;
-                ringProgress.style.strokeDashoffset = `${RING_CIRCUMFERENCE}`;
-                return;
-            }
-            const remainingFraction = Math.max(0, state.timerTime / state.timerTotal);
-            ringProgress.style.opacity = 1;
-            ringProgress.style.strokeDashoffset = `${RING_CIRCUMFERENCE * (1 - remainingFraction)}`;
-        }
-
-        function setTimerControlsDisabled(disabled) {
-            [hoursInput, minutesInput, secondsInput].forEach(el => { el.disabled = disabled; });
-            document.querySelectorAll('.unit-btn').forEach(btn => { btn.disabled = disabled; });
-        }
-
-        function setPlayIcon(playing) {
-            playIcon.innerHTML = playing
-                ? '<rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect>'
-                : '<path d="M8 5v14l11-7z"></path>';
-            timerPlayBtn.setAttribute('aria-label', playing ? 'Pause timer' : 'Start timer');
         }
 
         function toggleTimer() {
-            if (state.timerRunning) {
-                pauseTimerNew();
+            if (timerRunning) {
+                pauseTimer();
             } else {
-                startTimerNew();
+                startTimer();
             }
         }
 
-        function startTimerNew() {
-            if (state.timerTime <= 0) {
-                refreshTimerFromInputs();
+        function startTimer() {
+            if (!timerRunning) {
+                if (timerRemaining <= 0) {
+                    const h = parseInt(hoursInput.value, 10) || 0;
+                    const m = parseInt(minutesInput.value, 10) || 0;
+                    const s = parseInt(secondsInput.value, 10) || 0;
+                    timerDuration = h * 3600 + m * 60 + s;
+                    timerRemaining = timerDuration;
+                }
+                if (timerRemaining > 0) {
+                    timerRunning = true;
+                    playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+                    timerInterval = setInterval(() => {
+                        if (timerRemaining > 0) {
+                            timerRemaining--;
+                            updateTimerDisplay();
+                        } else {
+                            pauseTimer();
+                        }
+                    }, 1000);
+                }
             }
-            if (state.timerTime <= 0) return;
-            state.timerRunning = true;
-            setPlayIcon(true);
-            setTimerControlsDisabled(true);
         }
 
-        function pauseTimerNew() {
-            state.timerRunning = false;
-            setPlayIcon(false);
-            setTimerControlsDisabled(false);
+        function pauseTimer() {
+            timerRunning = false;
+            clearInterval(timerInterval);
+            playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
         }
 
-        function resetTimerNew() {
-            state.timerRunning = false;
-            setPlayIcon(false);
-            setTimerControlsDisabled(false);
-            setUnitValues(0, 5, 0);
-            refreshTimerFromInputs();
-            updateTabTitle('Clock');
+        function resetTimer() {
+            pauseTimer();
+            const h = parseInt(hoursInput.value, 10) || 0;
+            const m = parseInt(minutesInput.value, 10) || 0;
+            const s = parseInt(secondsInput.value, 10) || 0;
+            timerDuration = h * 3600 + m * 60 + s;
+            timerRemaining = timerDuration;
+            updateTimerDisplay();
         }
 
-        function tickTimer() {
-            if (state.mode !== 'timer' || !state.timerRunning) return;
-            state.timerTime--;
-            if (state.timerTime <= 0) {
-                state.timerTime = 0;
-                pauseTimerNew();
-                document.title = '✓ Timer Complete';
-            } else {
-                const h = Math.floor(state.timerTime / 3600);
-                const m = Math.floor((state.timerTime % 3600) / 60);
-                const s = state.timerTime % 60;
-                updateTabTitle(`Timer ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`);
+        // To-Do List Functions
+        function loadTasks() {
+            const saved = localStorage.getItem('todo_tasks');
+            if (saved) {
+                try {
+                    tasks = JSON.parse(saved);
+                    nextTaskId = tasks.reduce((max, t) => Math.max(max, t.id), 0) + 1;
+                } catch(e) { tasks = []; }
             }
-            const h = Math.floor(state.timerTime / 3600);
-            const m = Math.floor((state.timerTime % 3600) / 60);
-            const s = state.timerTime % 60;
-            setUnitValues(h, m, s);
-            updateRing();
+            renderTasks();
         }
 
-        function updateTabTitle(title) {
-            document.title = title;
+        function saveTasks() {
+            localStorage.setItem('todo_tasks', JSON.stringify(tasks));
+        }
+
+        function renderTasks() {
+            todoMainSection.innerHTML = '';
+
+            tasks.forEach(task => {
+                const card = document.createElement('div');
+                card.className = 'task-card' + (task.completed ? ' completed' : '');
+                card.draggable = true;
+                card.dataset.id = task.id;
+
+                card.innerHTML = `
+                    <button class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask(${task.id})">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </button>
+                    <div class="task-info">
+                        <div class="task-name">${escapeHtml(task.name)}</div>
+                    </div>
+                    <div class="task-drag-handle" title="Drag to reorder">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </div>
+                    <button class="task-delete-btn" onclick="deleteTask(${task.id})" title="Delete task">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </button>
+                `;
+
+                attachDragListeners(card);
+                todoMainSection.appendChild(card);
+            });
+
+            updateProgress();
+        }
+
+        // Drag & Drop Implementation
+        function attachDragListeners(card) {
+            card.addEventListener('dragstart', (e) => {
+                draggedTaskId = Number(card.dataset.id);
+                card.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', draggedTaskId);
+            });
+
+            card.addEventListener('dragend', () => {
+                card.classList.remove('dragging');
+                document.querySelectorAll('.task-card').forEach(c => c.classList.remove('drag-over'));
+                draggedTaskId = null;
+            });
+
+            card.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                const targetId = Number(card.dataset.id);
+                if (targetId !== draggedTaskId) {
+                    card.classList.add('drag-over');
+                }
+            });
+
+            card.addEventListener('dragleave', () => {
+                card.classList.remove('drag-over');
+            });
+
+            card.addEventListener('drop', (e) => {
+                e.preventDefault();
+                card.classList.remove('drag-over');
+                const targetTaskId = Number(card.dataset.id);
+
+                if (draggedTaskId === null || draggedTaskId === targetTaskId) return;
+
+                const fromIndex = tasks.findIndex(t => t.id === draggedTaskId);
+                const toIndex = tasks.findIndex(t => t.id === targetTaskId);
+
+                if (fromIndex !== -1 && toIndex !== -1) {
+                    const [movedTask] = tasks.splice(fromIndex, 1);
+                    tasks.splice(toIndex, 0, movedTask);
+
+                    saveTasks();
+                    renderTasks();
+                }
+            });
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function addTask() {
+            const text = newTaskInput.value.trim();
+            if (!text) return;
+            tasks.push({ id: nextTaskId++, name: text, completed: false });
+            newTaskInput.value = '';
+            saveTasks();
+            renderTasks();
+        }
+
+        window.toggleTask = function(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks();
+                renderTasks();
+            }
+        };
+
+        window.deleteTask = function(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasks();
+            renderTasks();
+        };
+
+        function updateProgress() {
+            const total = tasks.length;
+            const done = tasks.filter(t => t.completed).length;
+            const pct = total ? Math.round((done / total) * 100) : 0;
+            todoProgressText.textContent = `${done} of ${total} tasks completed`;
+            todoProgressPct.textContent = `${pct}%`;
+            todoProgressFill.style.width = `${pct}%`;
+        }
+
+        // Event listeners & controls
+        function setupEventListeners() {
+            document.addEventListener('mousemove', () => {
+                controls.classList.add('visible');
+                modeControls.classList.remove('dimmed');
+                clearTimeout(window.controlsTimeout);
+                window.controlsTimeout = setTimeout(() => {
+                    if (!settingsPanel.classList.contains('open') && !todoPanel.classList.contains('open')) {
+                        controls.classList.remove('visible');
+                        modeControls.classList.add('dimmed');
+                    }
+                }, 3000);
+            });
+
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentMode = btn.dataset.mode;
+                    if (currentMode === 'clock') {
+                        clockDisplay.style.display = 'block';
+                        timerDisplay.classList.remove('active');
+                    } else {
+                        clockDisplay.style.display = 'none';
+                        timerDisplay.classList.add('active');
+                    }
+                });
+            });
+
+            settingsBtn.addEventListener('click', () => settingsPanel.classList.add('open'));
+            closeBtn.addEventListener('click', () => settingsPanel.classList.remove('open'));
+
+            todoToggleBtn.addEventListener('click', () => todoPanel.classList.add('open'));
+            todoCloseBtn.addEventListener('click', () => todoPanel.classList.remove('open'));
+
+            addTaskBtn.addEventListener('click', addTask);
+            newTaskInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addTask();
+            });
+
+            timerPlayBtn.addEventListener('click', toggleTimer);
+            timerResetBtn.addEventListener('click', resetTimer);
+
+            fontSelect.addEventListener('change', (e) => {
+                body.className = body.className.replace(/font-\S+/g, '');
+                body.classList.add(e.target.value);
+                localStorage.setItem('font_choice', e.target.value);
+            });
+
+            formatToggle.addEventListener('click', () => {
+                is24Hour = !is24Hour;
+                formatToggle.classList.toggle('on', is24Hour);
+                formatLabel.textContent = is24Hour ? '24-Hour' : '12-Hour';
+                updateClock();
+            });
+
+            secondsToggle.addEventListener('click', () => {
+                showSeconds = !showSeconds;
+                secondsToggle.classList.toggle('on', showSeconds);
+                updateClock();
+            });
+        }
+
+        function loadSettings() {
+            const savedFont = localStorage.getItem('font_choice');
+            if (savedFont) {
+                fontSelect.value = savedFont;
+                body.classList.add(savedFont);
+            }
         }
 
         // Start
